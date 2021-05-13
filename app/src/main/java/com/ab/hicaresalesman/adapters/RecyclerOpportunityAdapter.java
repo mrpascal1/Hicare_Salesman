@@ -1,7 +1,6 @@
 package com.ab.hicaresalesman.adapters;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +23,13 @@ import java.util.List;
 /**
  * Created by Arjun Bhatt on 4/22/2021.
  */
-public class RecyclerViewOpportunityAdapter extends RecyclerView.Adapter<RecyclerViewOpportunityAdapter.ViewHolder> {
+public class RecyclerOpportunityAdapter extends RecyclerView.Adapter<RecyclerOpportunityAdapter.ViewHolder> {
 
     private OnListItemClickHandler onItemClickHandler;
     private final Context mContext;
     private static List<OpportunityViewModel> items = null;
 
-    public RecyclerViewOpportunityAdapter(Context context) {
+    public RecyclerOpportunityAdapter(Context context) {
         if (items == null) {
             items = new ArrayList<>();
         }
@@ -39,15 +38,15 @@ public class RecyclerViewOpportunityAdapter extends RecyclerView.Adapter<Recycle
 
     @NotNull
     @Override
-    public RecyclerViewOpportunityAdapter.ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
+    public RecyclerOpportunityAdapter.ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         ItemRecyclerOpportunityBinding mItemRecyclerOpportunityBinding =
                 DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
                         R.layout.item_recycler_opportunity, parent, false);
-        return new RecyclerViewOpportunityAdapter.ViewHolder(mItemRecyclerOpportunityBinding);
+        return new RecyclerOpportunityAdapter.ViewHolder(mItemRecyclerOpportunityBinding);
     }
 
     @Override
-    public void onBindViewHolder(@NotNull final RecyclerViewOpportunityAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NotNull final RecyclerOpportunityAdapter.ViewHolder holder, final int position) {
         try {
             holder.mItemRecyclerOpportunityBinding.txtName.setText(items.get(position).getName());
             holder.mItemRecyclerOpportunityBinding.txtName.setTypeface(holder.mItemRecyclerOpportunityBinding.txtName.getTypeface(),Typeface.BOLD);
@@ -57,7 +56,11 @@ public class RecyclerViewOpportunityAdapter extends RecyclerView.Adapter<Recycle
             holder.mItemRecyclerOpportunityBinding.txtStage.setText(items.get(position).getStageName());
             holder.mItemRecyclerOpportunityBinding.txtOppNo.setText(items.get(position).getOpportunityNo());
             holder.mItemRecyclerOpportunityBinding.txtOppType.setText(items.get(position).getOpportunityType());
-            holder.mItemRecyclerOpportunityBinding.txtProbablity.setText(items.get(position).getProbablity());
+            if(items.get(position).getProbablity()!=null){
+                holder.mItemRecyclerOpportunityBinding.txtProbablity.setText(items.get(position).getProbablity()+"%");
+            }else {
+                holder.mItemRecyclerOpportunityBinding.txtProbablity.setText("N/A");
+            }
             holder.mItemRecyclerOpportunityBinding.txtSubType.setText(items.get(position).getCustomerSubType());
             if(items.get(position).getOpportunityAmount()!=null){
                 holder.mItemRecyclerOpportunityBinding.lnrAmount.setVisibility(View.VISIBLE);

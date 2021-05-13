@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -21,7 +19,7 @@ import android.widget.Toast;
 import com.ab.hicaresalesman.BaseFragment;
 import com.ab.hicaresalesman.R;
 import com.ab.hicaresalesman.activities.AddTaskActivity;
-import com.ab.hicaresalesman.adapters.RecyclerViewOpportunityAdapter;
+import com.ab.hicaresalesman.adapters.RecyclerOpportunityAdapter;
 import com.ab.hicaresalesman.databinding.FragmentHomeBinding;
 import com.ab.hicaresalesman.handler.OnListItemClickHandler;
 import com.ab.hicaresalesman.network.NetworkCallController;
@@ -38,9 +36,8 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class HomeFragment extends BaseFragment {
-    private static final int REQ_OPPORTUNITY = 1000;
     FragmentHomeBinding mFragmentHomeBinding;
-    RecyclerViewOpportunityAdapter mAdapter;
+    RecyclerOpportunityAdapter mAdapter;
     RecyclerView.LayoutManager layoutManager;
     private List<OpportunityData> mOpportunityData;
 
@@ -76,7 +73,7 @@ public class HomeFragment extends BaseFragment {
         mFragmentHomeBinding.recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         mFragmentHomeBinding.recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerViewOpportunityAdapter(getActivity());
+        mAdapter = new RecyclerOpportunityAdapter(getActivity());
         mFragmentHomeBinding.recyclerView.setAdapter(mAdapter);
 
         getRecentOpportunity();
@@ -88,7 +85,7 @@ public class HomeFragment extends BaseFragment {
             NetworkCallController controller = new NetworkCallController(this);
             controller.setListner(new NetworkResponseListner<List<OpportunityData>>() {
                 @Override
-                public void onResponse(int requestCode, List<OpportunityData> items) {
+                public void onResponse(List<OpportunityData> items) {
                     if (items != null && items.size() > 0) {
                         mOpportunityData = new ArrayList<>();
                         mOpportunityData = items;
@@ -99,18 +96,19 @@ public class HomeFragment extends BaseFragment {
                             public void onItemClick(int position) {
                                 startActivity(new Intent(getActivity(), AddTaskActivity.class)
                                         .putExtra(AddTaskActivity.ARGS_OPP_NO, items.get(position).getOpportunityNumberC())
-                                        .putExtra(AddTaskActivity.ARGS_INDUSTRY, items.get(position).getSubTypeC()));
+                                        .putExtra(AddTaskActivity.ARGS_INDUSTRY, items.get(position).getSubTypeC())
+                                );
                             }
                         });
                     }
                 }
 
                 @Override
-                public void onFailure(int requestCode) {
+                public void onFailure() {
 
                 }
             });
-            controller.getRecentOpportunity(REQ_OPPORTUNITY, "00528000002IZ04AAG");
+            controller.getRecentOpportunity("00528000002IZ04AAG");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,18 +169,18 @@ public class HomeFragment extends BaseFragment {
             NetworkCallController controller = new NetworkCallController(HomeFragment.this);
             controller.setListner(new NetworkResponseListner<List<OpportunityData>>() {
                 @Override
-                public void onResponse(int requestCode, List<OpportunityData> items) {
+                public void onResponse(List<OpportunityData> items) {
                     if (items != null) {
                         filter(newText, items);
                     }
                 }
 
                 @Override
-                public void onFailure(int requestCode) {
+                public void onFailure() {
 
                 }
             });
-            controller.getSearchOpportunity(REQ_OPPORTUNITY, newText, "00528000002IZ04AAG");
+            controller.getSearchOpportunity(newText, "00528000002IZ04AAG");
         } catch (Exception e) {
             e.printStackTrace();
         }

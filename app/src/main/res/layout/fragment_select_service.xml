@@ -1,32 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
+        android:id="@+id/frameService"
         android:layout_height="match_parent"
-        tools:context=".fragments.SelectServiceFragment">
+        android:layout_width="match_parent">
 
-        <TextView
-            android:id="@+id/txtHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select Service"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginTop="30dp"
-            android:layout_marginLeft="20dp"
-            />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtHeader"
-            tools:listitem="@layout/item_recycler_select_service_adapter"
-            android:layout_marginTop="30dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"/>
+            android:layout_height="match_parent"
+            android:background="@color/smoke_gray">
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/txtHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Service"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/themeColor"
+                android:layout_marginTop="25dp"
+                android:layout_marginLeft="20dp"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtHeader"
+                tools:listitem="@layout/item_recycler_select_service_adapter"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"/>
+
+        </RelativeLayout>
+
+    </FrameLayout>
 </layout>

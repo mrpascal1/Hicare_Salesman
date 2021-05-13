@@ -11,14 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ab.hicaresalesman.R;
 import com.ab.hicaresalesman.databinding.ItemRecyclerActivityAdapterBinding;
-import com.ab.hicaresalesman.databinding.ItemRecyclerOpportunityBinding;
 import com.ab.hicaresalesman.handler.OnItemDeleteClickHandler;
 import com.ab.hicaresalesman.handler.OnListItemClickHandler;
 import com.ab.hicaresalesman.network.models.activity.ActivityData;
-import com.ab.hicaresalesman.network.models.opportunity.OpportunityData;
 import com.ab.hicaresalesman.utils.AppUtils;
 import com.ab.hicaresalesman.viewmodel.ActivityViewModel;
-import com.ab.hicaresalesman.viewmodel.OpportunityViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,14 +26,14 @@ import java.util.List;
 /**
  * Created by Arjun Bhatt on 4/23/2021.
  */
-public class RecyclerViewAddActivityAdapter extends RecyclerView.Adapter<RecyclerViewAddActivityAdapter.ViewHolder> {
+public class RecyclerAddActivityAdapter extends RecyclerView.Adapter<RecyclerAddActivityAdapter.ViewHolder> {
 
     private OnListItemClickHandler onItemClickHandler;
     private OnItemDeleteClickHandler mItemDeleteClickHandler;
     private final Context mContext;
     private static List<ActivityViewModel> items = null;
 
-    public RecyclerViewAddActivityAdapter(Context context) {
+    public RecyclerAddActivityAdapter(Context context) {
         if (items == null) {
             items = new ArrayList<>();
         }
@@ -45,15 +42,15 @@ public class RecyclerViewAddActivityAdapter extends RecyclerView.Adapter<Recycle
 
     @NotNull
     @Override
-    public RecyclerViewAddActivityAdapter.ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
+    public RecyclerAddActivityAdapter.ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         ItemRecyclerActivityAdapterBinding mRecyclerActivityAdapterBinding =
                 DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
                         R.layout.item_recycler_activity_adapter, parent, false);
-        return new RecyclerViewAddActivityAdapter.ViewHolder(mRecyclerActivityAdapterBinding);
+        return new RecyclerAddActivityAdapter.ViewHolder(mRecyclerActivityAdapterBinding);
     }
 
     @Override
-    public void onBindViewHolder(@NotNull final RecyclerViewAddActivityAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NotNull final RecyclerAddActivityAdapter.ViewHolder holder, final int position) {
         try {
             holder.itemRecyclerActivityAdapterBinding.txtActivityName.setText(items.get(position).getActivityName());
             holder.itemRecyclerActivityAdapterBinding.txtActivityCode.setText(items.get(position).getActivityCode());

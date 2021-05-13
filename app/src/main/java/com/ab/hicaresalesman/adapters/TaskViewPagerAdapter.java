@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskViewPagerAdapter extends FragmentPagerAdapter {
+public class TaskViewPagerAdapter extends FragmentPagerAdapter  {
     private final List<Fragment> mFragmentList = new ArrayList<>();
     private final ArrayList<String> mFragmentTitle = new ArrayList<>();
 
@@ -23,6 +23,7 @@ public class TaskViewPagerAdapter extends FragmentPagerAdapter {
     @NotNull
     @Override
     public Fragment getItem(int position) {
+
         return mFragmentList.get(position);
     }
 
@@ -30,6 +31,10 @@ public class TaskViewPagerAdapter extends FragmentPagerAdapter {
         mFragmentList.add(fragment);
         mFragmentTitle.add(title);
     }
+
+//    public void getFragment(Fragment fragment, String title) {
+//        mFragmentList.get(fragment);
+//    }
 
     @Override
     public int getCount() {

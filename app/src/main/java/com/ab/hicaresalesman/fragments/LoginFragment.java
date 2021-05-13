@@ -30,7 +30,6 @@ import java.util.Objects;
  */
 public class LoginFragment extends BaseFragment implements UserLoginClickHandler {
     FragmentLoginBinding mFragmentLoginBinding;
-    private static final int LOGIN_REQUEST = 1000;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -66,7 +65,7 @@ public class LoginFragment extends BaseFragment implements UserLoginClickHandler
                 String password = mFragmentLoginBinding.edtPassword.getText().toString();
                 controller.setListner(new NetworkResponseListner<LoginData>() {
                     @Override
-                    public void onResponse(int requestCode, LoginData response) {
+                    public void onResponse(LoginData response) {
                         getRealm().beginTransaction();
                         getRealm().deleteAll();
                         getRealm().commitTransaction();
@@ -79,11 +78,11 @@ public class LoginFragment extends BaseFragment implements UserLoginClickHandler
                     }
 
                     @Override
-                    public void onFailure(int requestCode) {
+                    public void onFailure() {
 
                     }
                 });
-                controller.login(LOGIN_REQUEST, username, password);
+                controller.login(username, password);
             }
 
         } catch (Exception e) {

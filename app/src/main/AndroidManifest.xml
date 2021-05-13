@@ -10,6 +10,14 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
 
     <application
         android:name=".BaseApplication"
@@ -22,7 +30,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.TaskDetailsActivity"></activity>
+        <activity android:name=".activities.TaskDetailsActivity"/>
         <activity android:name=".activities.AddTaskActivity" />
         <activity
             android:name=".activities.SplashActivity"
@@ -39,6 +47,7 @@
         <activity
             android:name=".activities.HomeActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".activities.Camera2Activity" />
     </application>
 
 </manifest>

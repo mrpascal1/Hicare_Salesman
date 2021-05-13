@@ -1,11 +1,23 @@
 package com.ab.hicaresalesman.network;
 
+import com.ab.hicaresalesman.network.models.BaseResponse;
 import com.ab.hicaresalesman.network.models.activity.ActivityResponse;
 import com.ab.hicaresalesman.network.models.activity.AddActivityRequest;
 import com.ab.hicaresalesman.network.models.activity.AddActivityResponse;
+import com.ab.hicaresalesman.network.models.area.AddAreaRequest;
+import com.ab.hicaresalesman.network.models.area.AreaResponse;
+import com.ab.hicaresalesman.network.models.frequency.FrequencyRequest;
+import com.ab.hicaresalesman.network.models.frequency.FrequencyResponse;
+import com.ab.hicaresalesman.network.models.image_upload.ImageUploadRequest;
+import com.ab.hicaresalesman.network.models.image_upload.ImageUploadResponse;
 import com.ab.hicaresalesman.network.models.login.LoginResponse;
 import com.ab.hicaresalesman.network.models.opportunity.OpportunityResponse;
+import com.ab.hicaresalesman.network.models.pest_service.AddServiceRequest;
 import com.ab.hicaresalesman.network.models.pest_service.ServiceResponse;
+import com.ab.hicaresalesman.network.models.question.QuestionResponse;
+import com.ab.hicaresalesman.network.models.question.SaveAnswerRequest;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -40,6 +52,42 @@ public interface IRetrofit {
 
     /*[ServiceMaster/GetServiceByActivity]*/
     @GET("ServiceMaster/GetServiceByActivity")
-    Call<ServiceResponse> getServiceByActivity(@Query("activityId") int userId);
+    Call<ServiceResponse> getServiceByActivity(@Query("activityId") int activityId);
 
+    /*[QuestionMaster/GetQuestionListByActivity]*/
+    @GET("QuestionMaster/GetQuestionListByActivity")
+    Call<QuestionResponse> getQuestionsByActivity(@Query("activityId") int activityId);
+
+
+    /*[QuestionMaster/GetQuestionListByActivity]*/
+    @GET("IndustrySubAreaMaster/GetActivitySubAreaList")
+    Call<AreaResponse> getSubArea(@Query("activityId") int activityId);
+
+    /*[Attachment/UploadAttachment]*/
+    @POST("Attachment/UploadAttachment")
+    Call<ImageUploadResponse> uploadImage(@Body ImageUploadRequest request);
+
+
+//    @POST("Task/UploadOnsiteImage")
+//    Call<CovidResponse> uploadOnsiteImage(@Body CovidRequest request);
+
+    /*[ServiceMaster/AddServiceByActivity]*/
+    @POST("ServiceMaster/AddServiceByActivity")
+    Call<BaseResponse> addServiceByActivity(@Body List<AddServiceRequest> request);
+
+    /*[QuestionMaster/SaveAnswers]*/
+    @POST("QuestionMaster/SaveAnswers")
+    Call<BaseResponse> saveAnswers(@Body List<SaveAnswerRequest> request);
+
+    /*[IndustrySubAreaMaster/AddActivitySubArea]*/
+    @POST("IndustrySubAreaMaster/AddActivitySubArea")
+    Call<BaseResponse> addSubArea(@Body List<AddAreaRequest> request);
+
+    /*[RecommendedFrequency/GetRecommendedFrequencyList]*/
+    @GET("RecommendedFrequency/GetRecommendedFrequencyList")
+    Call<FrequencyResponse> getFrequencyList(@Query("activityId") int activityId);
+
+    /*[RecommendedFrequency/AddRecommendedFrequency]*/
+    @POST("RecommendedFrequency/AddRecommendedFrequency")
+    Call<BaseResponse> addFrequency(@Body List<FrequencyRequest> request);
 }

@@ -1,5 +1,6 @@
 package com.ab.hicaresalesman.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -18,7 +19,7 @@ import android.widget.Toast;
 import com.ab.hicaresalesman.BaseFragment;
 import com.ab.hicaresalesman.R;
 import com.ab.hicaresalesman.activities.TaskDetailsActivity;
-import com.ab.hicaresalesman.adapters.RecyclerViewAddActivityAdapter;
+import com.ab.hicaresalesman.adapters.RecyclerAddActivityAdapter;
 import com.ab.hicaresalesman.databinding.FragmentAddTaskBinding;
 import com.ab.hicaresalesman.handler.OnItemDeleteClickHandler;
 import com.ab.hicaresalesman.handler.OnListItemClickHandler;
@@ -38,14 +39,13 @@ import java.util.Objects;
  * Use the {@link AddTaskFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddTaskFragment extends BaseFragment implements UserActivityAddClickHandler, OnItemDeleteClickHandler {
-    private static final int REQ_ACTIVITY = 1000;
+public class AddTaskFragment extends BaseFragment implements UserActivityAddClickHandler, OnItemDeleteClickHandler, AddActivityBottomSheet.IdialogDismissFragmentReload {
     public static final String ARGS_OPP_NO = "ARGS_OPP_NO";
     public static final String ARGS_INDUSTRY = "ARGS_INDUSTRY";
     FragmentAddTaskBinding mFragmentAddTaskBinding;
     private String opportunityId;
     private String industryName;
-    RecyclerViewAddActivityAdapter mAdapter;
+    RecyclerAddActivityAdapter mAdapter;
     RecyclerView.LayoutManager layoutManager;
 
 
@@ -87,7 +87,7 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
         mFragmentAddTaskBinding.recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         mFragmentAddTaskBinding.recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerViewAddActivityAdapter(getActivity());
+        mAdapter = new RecyclerAddActivityAdapter(getActivity());
         mAdapter.setItemDeleteClickHandler(this);
         mFragmentAddTaskBinding.recyclerView.setAdapter(mAdapter);
 
@@ -100,25 +100,26 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
 
             controller.setListner(new NetworkResponseListner<List<ActivityData>>() {
                 @Override
-                public void onResponse(int requestCode, List<ActivityData> items) {
+                public void onResponse(List<ActivityData> items) {
                     if (items != null && items.size() > 0) {
                         mAdapter.setData(items);
                         mAdapter.notifyDataSetChanged();
                         mAdapter.setOnItemClickHandler(new OnListItemClickHandler() {
                             @Override
                             public void onItemClick(int position) {
-                                startActivity(new Intent(getActivity(), TaskDetailsActivity.class));
+                                startActivity(new Intent(getActivity(), TaskDetailsActivity.class)
+                                        .putExtra(TaskDetailsActivity.ARGS_ACTIVITY, mAdapter.getItem(position).getActivityId()));
                             }
                         });
                     }
                 }
 
                 @Override
-                public void onFailure(int requestCode) {
+                public void onFailure() {
 
                 }
             });
-            controller.getActivityList(REQ_ACTIVITY, opportunityId);
+            controller.getActivityList(opportunityId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -128,7 +129,9 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
     public void onActivityAddClicked(View view) {
         try {
             AddActivityBottomSheet bottomSheet = new AddActivityBottomSheet(opportunityId, industryName);
+            bottomSheet.setListener(this);
             bottomSheet.show(Objects.requireNonNull(getActivity()).getSupportFragmentManager(), bottomSheet.getTag());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,7 +155,7 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
             request.setModifiedOn(AppUtils.currentDateTime());
             controller.setListner(new NetworkResponseListner<AddActivityResponse>() {
                 @Override
-                public void onResponse(int requestCode, AddActivityResponse response) {
+                public void onResponse(AddActivityResponse response) {
                     if (response.getIsSuccess()) {
                         Toast.makeText(getActivity(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
                         getActivityList();
@@ -160,13 +163,18 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
                 }
 
                 @Override
-                public void onFailure(int requestCode) {
+                public void onFailure() {
 
                 }
             });
-            controller.addActivity(REQ_ACTIVITY, request);
+            controller.addActivity(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onDismisClick() {
+        getActivityList();
     }
 }

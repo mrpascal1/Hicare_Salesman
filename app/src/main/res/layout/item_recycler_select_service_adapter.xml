@@ -1,47 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/lnrCheck"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/round_border"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/lnrCheck"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="25dp"
-            android:background="@drawable/round_border"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical">
+            android:layout_height="match_parent"
+            android:gravity="center_vertical">
 
 
-                <TextView
-                    android:id="@+id/txtServiceName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
-                    android:text="Service Name"
-                    android:textColor="@color/black"
-                    android:textSize="17sp" />
+            <TextView
+                android:id="@+id/txtServiceName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:text="Service Name"
+                android:textColor="@color/black"
+                android:textSize="17sp" />
 
-                <CheckBox
-                    android:id="@+id/checkOption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentRight="true"
-                   android:layout_marginRight="20dp" />
+            <CheckBox
+                android:id="@+id/checkOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="20dp" />
 
-            </RelativeLayout>
-
-
-        </LinearLayout>
+        </RelativeLayout>
 
 
-    </RelativeLayout>
+    </LinearLayout>
+
+
 </layout>

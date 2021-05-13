@@ -1,13 +1,11 @@
-//buildscript {
-//    repositories {
-//        maven { url 'https://plugins.gradle.org/m2/' }
-//    }
-//    dependencies {
-//        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:0.12.10'
-//    }
-//}
-//apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
-
+buildscript {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+}
+plugins {
+    id 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+}
 repositories {
     maven { url 'https://maven.google.com' }
 }
@@ -24,7 +22,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -59,19 +57,25 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     api 'com.google.android.material:material:1.4.0-alpha02'
-    api 'androidx.multidex:multidex:2.0.1'
-    api 'com.squareup.retrofit2:retrofit:2.5.0'
-    api 'com.squareup.retrofit2:converter-gson:2.5.0'
-    api 'com.squareup.okhttp3:logging-interceptor:3.12.0'
-    api 'com.squareup.okhttp3:okhttp:3.12.1'
-//    api 'com.onesignal:OneSignal:3.15.7'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+    api 'com.squareup.retrofit2:converter-gson:2.9.0'
+    api 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
+    api 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    implementation 'com.onesignal:OneSignal:4.2.0'
+    api 'com.squareup.picasso:picasso:2.71828'
+    api 'de.hdodenhof:circleimageview:3.1.0'
     api 'com.orhanobut:logger:2.2.0'
     api 'io.github.inflationx:calligraphy3:3.1.1'
     api 'io.github.inflationx:viewpump:2.0.3'
+    api 'com.ogaclejapan.smarttablayout:library:2.0.0@aar'
+    implementation 'com.evrencoskun.library:tableview:0.8.9.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
+    implementation platform('com.google.firebase:firebase-bom:27.1.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
 }
-//apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.gms.google-services'

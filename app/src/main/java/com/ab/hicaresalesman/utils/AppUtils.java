@@ -37,6 +37,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 
+import com.ab.hicaresalesman.BaseFragment;
+import com.ab.hicaresalesman.network.NetworkCallController;
+import com.ab.hicaresalesman.network.NetworkResponseListner;
+import com.ab.hicaresalesman.network.models.area.AddAreaRequest;
+import com.ab.hicaresalesman.network.models.area.AreaData;
+import com.ab.hicaresalesman.network.models.area.AreaType;
+import com.ab.hicaresalesman.network.models.area.ServiceActivity;
+import com.ab.hicaresalesman.network.models.area.ServiceActivityRequest;
+import com.ab.hicaresalesman.network.models.area.TowerData;
 import com.google.gson.Gson;
 
 import java.io.Serializable;
@@ -51,32 +60,23 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
 import io.realm.Realm;
 
 
 public class AppUtils {
 
-    private static final int CAM_REQ = 1000;
-    private static final int HANDSHAKE_REQUEST = 2000;
-    private static final int ERROR_REQUEST = 3000;
-    private static final int RESOURCE_REQ = 4000;
-    private static final int CONSINS_REQ = 5000;
-    public static int Ins_Size = 0;
-
-
-
-    public static boolean isInspectionDone = false;
-    public static String appointmentDate = "";
-    public static String infestationLevel = "";
-    public static String appointmentStartTime = "";
-    public static String appointmentEndTime = "";
+    public static List<AreaType> mCommonList = null;
+    public static List<AreaType> mRegularList = null;
+    public static List<TowerData> mCommonTowerList = null;
+    public static List<TowerData> mRegularTowerList = null;
+    public static List<ServiceActivity> mServiceList = new ArrayList<>();
+    public static List<AddAreaRequest> mAreaData = new ArrayList<>();
+    public  static boolean isCommonAllowMultiple = false;
+    public  static boolean isRegularAllowMultiple = false;
+    private static final int REQ_AREA = 1000;
     public static String CAMERA_ORIENTATION = "CAMERA_ORIENTATION";
-    public static String CAMERA_SCREEN = "";
-    public static boolean NOT_RENEWAL_DONE = false;
-
-
-
-
+    public static String CAMERA_SCREEN = "QUESTIONS";
 
 
     public static void getCurrentTimeUsingCalendar() {
@@ -271,7 +271,6 @@ public class AppUtils {
     }
 
 
-
     public static String reFormatDateTime(String dateIn, String format) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
         Date date = simpleDateFormat.parse(dateIn);
@@ -286,7 +285,6 @@ public class AppUtils {
         simpleDateFormat = new SimpleDateFormat(format);
         return simpleDateFormat.format(date);
     }
-
 
 
     private static void buildAlertMessageNoGps(final Context context) {
@@ -317,7 +315,6 @@ public class AppUtils {
     }
 
 
-
     public static String getCurrentTimeStamp() {
         String s = "";
         try {
@@ -332,6 +329,41 @@ public class AppUtils {
         return s;
     }
 
+    public static void getAreaByActivity(int activityId) {
+        try {
+            NetworkCallController controller = new NetworkCallController();
+            controller.setListner(new NetworkResponseListner<List<AreaType>>() {
+                @Override
+                public void onResponse(List<AreaType> items) {
+                    mCommonList = new ArrayList<>();
+                    mRegularList = new ArrayList<>();
+                    mCommonTowerList = new ArrayList<>();
+                    mRegularTowerList = new ArrayList<>();
+                    if (items != null && items.size() > 0) {
+                        for (AreaType data : items) {
+                            if (data.getTemplateType().equals("Common Area")) {
+                                mCommonList.add(data);
+                                mCommonTowerList.addAll(data.getData());
+                                isCommonAllowMultiple = data.getAllowMultiple();
+                            } else {
+                                mRegularList.add(data);
+                                mRegularTowerList.addAll(data.getData());
+                                isRegularAllowMultiple = data.getAllowMultiple();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+
+                }
+            });
+            controller.getActivityBySubArea(activityId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

@@ -3,6 +3,7 @@ package com.ab.hicaresalesman.fragments;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -30,16 +31,22 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class AddActivityBottomSheet extends BottomSheetDialogFragment implements UserBottomSheetActivityHandler {
-    private static final int REQ_ACTIVITY = 1000;
     FragmentAddActivityBottomSheetBinding mAddActivityBottomSheetBinding;
     private String opportunityId;
     private String industryName;
     private Context mContext;
 
+    private IdialogDismissFragmentReload mIReminderAdded;
+
+    public void setListener(IdialogDismissFragmentReload listener) {
+        mIReminderAdded = listener;
+    }
+
     public AddActivityBottomSheet(String opportunityId, String industryName) {
         this.industryName = industryName;
         this.opportunityId = opportunityId;
     }
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -57,7 +64,7 @@ public class AddActivityBottomSheet extends BottomSheetDialogFragment implements
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mAddActivityBottomSheetBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_activity_bottom_sheet, container, false);
-       mAddActivityBottomSheetBinding.setHandler(this);
+        mAddActivityBottomSheetBinding.setHandler(this);
         return mAddActivityBottomSheetBinding.getRoot();
     }
 
@@ -80,6 +87,7 @@ public class AddActivityBottomSheet extends BottomSheetDialogFragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mAddActivityBottomSheetBinding.txtTitle.setTypeface(mAddActivityBottomSheetBinding.txtTitle.getTypeface(), Typeface.BOLD);
+        mAddActivityBottomSheetBinding.txtIndustry.setText("(Industry - " + industryName + ")");
     }
 
     @Override
@@ -87,11 +95,11 @@ public class AddActivityBottomSheet extends BottomSheetDialogFragment implements
         try {
             NetworkCallController controller = new NetworkCallController();
             AddActivityRequest request = new AddActivityRequest();
-            request.setActivityCode(mAddActivityBottomSheetBinding.edtCode.getText().toString());
+            request.setActivityCode("12323.98657");
             request.setActivityId(0);
             request.setActivityName(mAddActivityBottomSheetBinding.edtName.getText().toString());
             request.setIndustryId(0);
-            request.setIndustryName(mAddActivityBottomSheetBinding.edtIndustryName.getText().toString());
+            request.setIndustryName(industryName);
             request.setOpportunityId(opportunityId);
             request.setIsDeleted(false);
             request.setCreatedByIdUser(0);
@@ -100,20 +108,32 @@ public class AddActivityBottomSheet extends BottomSheetDialogFragment implements
             request.setModifiedOn(AppUtils.currentDateTime());
             controller.setListner(new NetworkResponseListner<AddActivityResponse>() {
                 @Override
-                public void onResponse(int requestCode, AddActivityResponse response) {
-                    if(response.getIsSuccess()){
+                public void onResponse(AddActivityResponse response) {
+                    if (response.getIsSuccess()) {
                         Toast.makeText(mContext, "Added Successfully", Toast.LENGTH_SHORT).show();
+                        dismiss();
                     }
                 }
 
                 @Override
-                public void onFailure(int requestCode) {
+                public void onFailure() {
 
                 }
             });
-            controller.addActivity(REQ_ACTIVITY, request);
-        }catch (Exception e){
+            controller.addActivity(request);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        mIReminderAdded.onDismisClick();
+        dismiss();
+    }
+
+    public interface IdialogDismissFragmentReload {
+        public void onDismisClick();
     }
 }

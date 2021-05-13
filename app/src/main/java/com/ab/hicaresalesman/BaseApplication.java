@@ -13,11 +13,13 @@ import com.ab.hicaresalesman.network.HeaderInterceptor;
 import com.ab.hicaresalesman.network.IRetrofit;
 import com.ab.hicaresalesman.network.RequestHeader;
 import com.ab.hicaresalesman.network.models.login.LoginData;
+import com.ab.hicaresalesman.utils.notifications.OneSIgnalHelper;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.onesignal.OneSignal;
 
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +41,7 @@ public class BaseApplication extends Application {
 
     private static volatile IRetrofit IRETROFIT = null;
     private static volatile Realm REALM = null;
-//    private OneSIgnalHelper mOneSignalHelper;
+    private static final String ONESIGNAL_APP_ID = "2864d171-0498-4fb6-aed7-ff8be7fdb197";
 
 
     public static synchronized Realm getRealm() {
@@ -78,11 +80,9 @@ public class BaseApplication extends Application {
                 .connectTimeout(60, TimeUnit.SECONDS);
 
 
-        if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            httpClientBuilder.addInterceptor(loggingInterceptor);
-        }
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        httpClientBuilder.addInterceptor(loggingInterceptor);
         if (autohrised) httpClientBuilder.addInterceptor(new HeaderInterceptor(getHeader()));
 
         IRETROFIT = new Retrofit.Builder().baseUrl(IRetrofit.BASE_URL)
@@ -90,6 +90,7 @@ public class BaseApplication extends Application {
                 .callFactory(httpClientBuilder.build())
                 .build()
                 .create(IRetrofit.class);
+
 
         return IRETROFIT;
     }
@@ -113,7 +114,12 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-//        mOneSignalHelper = new OneSIgnalHelper(this);
+        // Enable verbose OneSignal logging to debug issues if needed.
+        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+
+        // OneSignal Initialization
+        OneSignal.initWithContext(this);
+        OneSignal.setAppId(ONESIGNAL_APP_ID);
         // initialise the realm database
         try {
             Realm.init(this);

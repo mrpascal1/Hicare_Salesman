@@ -1,5 +1,6 @@
 package com.ab.hicaresalesman.fragments;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -9,22 +10,32 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.ab.hicaresalesman.BaseFragment;
 import com.ab.hicaresalesman.R;
-import com.ab.hicaresalesman.adapters.RecyclerViewOpportunityAdapter;
-import com.ab.hicaresalesman.adapters.RecyclerViewServiceAdapter;
+import com.ab.hicaresalesman.adapters.RecycleSelectServiceAdapter;
 import com.ab.hicaresalesman.databinding.FragmentSelectServiceBinding;
 import com.ab.hicaresalesman.handler.OnListItemClickHandler;
+import com.ab.hicaresalesman.handler.OnNextEventHandler;
 import com.ab.hicaresalesman.network.NetworkCallController;
 import com.ab.hicaresalesman.network.NetworkResponseListner;
+import com.ab.hicaresalesman.network.models.BaseResponse;
+import com.ab.hicaresalesman.network.models.pest_service.AddServiceRequest;
 import com.ab.hicaresalesman.network.models.pest_service.ServiceData;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,27 +43,51 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class SelectServiceFragment extends BaseFragment {
-    private static final int REQ_SERVICE = 1000;
     FragmentSelectServiceBinding mFragmentSelectServiceBinding;
-    RecyclerViewServiceAdapter mAdapter;
+    public static final String ARGS_ACTIVITY = "ARGS_ACTIVITY";
+
+    RecycleSelectServiceAdapter mAdapter;
     RecyclerView.LayoutManager layoutManager;
+    private OnNextEventHandler mCallback;
+    private ViewPager viewPager;
+    private int activityId = 0;
+    private HashMap<Integer, AddServiceRequest> mMap = new HashMap<>();
+
+    private List<AddServiceRequest> mServiceList = new ArrayList<>();
 
     public SelectServiceFragment() {
         // Required empty public constructor
     }
 
-    public static SelectServiceFragment newInstance() {
+    public static SelectServiceFragment newInstance(int activityId) {
         SelectServiceFragment fragment = new SelectServiceFragment();
         Bundle args = new Bundle();
+        args.putInt(ARGS_ACTIVITY, activityId);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle oldInstanceState) {
+        super.onSaveInstanceState(oldInstanceState);
+    }
+
+    @Override
+    public void onAttach(@NotNull Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (OnNextEventHandler) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement FragmentToActivity");
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
+            activityId = getArguments().getInt(ARGS_ACTIVITY);
         }
     }
 
@@ -67,10 +102,48 @@ public class SelectServiceFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        viewPager = getActivity().findViewById(R.id.viewPager);
         mFragmentSelectServiceBinding.recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         mFragmentSelectServiceBinding.recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerViewServiceAdapter(getActivity());
+        mAdapter = new RecycleSelectServiceAdapter(getActivity(), mMap, (serviceId, position, isChecked) -> {
+//            if (isChecked) {
+//            for (int i = 0; i < mAdapter.getItemCount(); i++) {
+//                AddServiceRequest request = new AddServiceRequest();
+//                request.setActivityId(activityId);
+//                request.setServiceId(mAdapter.getItem(position).getServiceId());
+//                request.setServiceName(mAdapter.getItem(position).getServiceName());
+//                request.setServiceCode(mAdapter.getItem(position).getServiceCode());
+//                request.setCreatedBy(mAdapter.getItem(position).getCreatedBy());
+//                request.setIsSelected(mAdapter.getItem(position).isSelected());
+//                mServiceList.add(request);
+////            }
+////            } else {
+////                if (mServiceList != null) {
+////                    for (int i = 0; i < mAdapter.getItemCount(); i++) {
+////                        if (!mAdapter.getItem(i).isSelected()) {
+////                            mServiceList.remove(i);
+////                        }
+////                    }
+////
+////                }
+////            }
+
+            if (isChecked) {
+                AddServiceRequest request = new AddServiceRequest();
+                request.setActivityId(activityId);
+                request.setServiceId(mAdapter.getItem(position).getServiceId());
+                request.setServiceName(mAdapter.getItem(position).getServiceName());
+                request.setServiceCode(mAdapter.getItem(position).getServiceCode());
+                request.setCreatedBy(mAdapter.getItem(position).getCreatedBy());
+//                mServiceList.add(request);
+                mMap.put(serviceId, request);
+            } else {
+                if (mMap.containsKey(serviceId)) {
+                    mMap.remove(serviceId);
+                }
+            }
+        });
         mFragmentSelectServiceBinding.recyclerView.setAdapter(mAdapter);
         mFragmentSelectServiceBinding.txtHeader.setTypeface(mFragmentSelectServiceBinding.txtHeader.getTypeface(), Typeface.BOLD);
         getServicesByActivity();
@@ -78,12 +151,13 @@ public class SelectServiceFragment extends BaseFragment {
 
     private void getServicesByActivity() {
         try {
+
             NetworkCallController controller = new NetworkCallController(this);
             controller.setListner(new NetworkResponseListner<List<ServiceData>>() {
 
                 @Override
-                public void onResponse(int requestCode, List<ServiceData> items) {
-                    if(items!=null && items.size() > 0){
+                public void onResponse(List<ServiceData> items) {
+                    if (items != null && items.size() > 0) {
                         mAdapter.setData(items);
                         mAdapter.notifyDataSetChanged();
                         mAdapter.setOnItemClickHandler(new OnListItemClickHandler() {
@@ -96,13 +170,50 @@ public class SelectServiceFragment extends BaseFragment {
                 }
 
                 @Override
-                public void onFailure(int requestCode) {
+                public void onFailure() {
 
                 }
             });
-            controller.getServiceByActivity(REQ_SERVICE, 1);
-        }catch (Exception e){
+            controller.getServiceByActivity(activityId);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void addServiceByActivity() {
+        try {
+            Log.d("12345", String.valueOf(this.toString()));
+            Log.d("12345", String.valueOf(mMap.toString()));
+            if (mMap != null && mMap.size() > 0) {
+                mServiceList = new ArrayList<>(mMap.values());
+                NetworkCallController controller = new NetworkCallController(this);
+                controller.setListner(new NetworkResponseListner<BaseResponse>() {
+                    @Override
+                    public void onResponse(BaseResponse response) {
+                        if (response.getIsSuccess()) {
+//                            mServiceList.clear();
+                            Log.d("12345", String.valueOf(mMap.toString()));
+                            Toast.makeText(getActivity(), "Added Successfully", Toast.LENGTH_SHORT).show();
+//                            mCallback.isServiceSelected(true);
+                            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
+                controller.addServiceByActivity(mServiceList);
+            } else {
+                Toast.makeText(getActivity(), "Please select service!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void refresh() {
+        getServicesByActivity();
     }
 }

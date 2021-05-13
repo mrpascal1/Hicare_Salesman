@@ -1,12 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/frameArea"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".fragments.ServiceAreaFragment">
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
 
 
+
+            <com.ogaclejapan.smarttablayout.SmartTabLayout
+                android:id="@+id/viewpagertab"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/white"
+                app:stl_clickable="true"
+                app:stl_defaultTabBackground="?attr/selectableItemBackground"
+                app:stl_defaultTabTextAllCaps="false"
+                app:stl_defaultTabTextColor="@color/colorPrimary"
+                app:stl_defaultTabTextHorizontalPadding="10dp"
+                app:stl_defaultTabTextMinWidth="0dp"
+                app:stl_defaultTabTextSize="12sp"
+                app:stl_distributeEvenly="false"
+                app:stl_dividerColor="@color/colorPrimary"
+                app:stl_dividerThickness="0.5dp"
+                app:stl_drawDecorationAfterTab="false"
+                app:stl_indicatorAlwaysInCenter="false"
+                app:stl_indicatorColor="@color/colorPrimary"
+                app:stl_indicatorCornerRadius="15dp"
+                app:stl_indicatorInFront="false"
+                app:stl_indicatorInterpolation="smart"
+                app:stl_indicatorThickness="3dp"
+                app:stl_indicatorWidth="auto"
+                app:stl_indicatorWithoutPadding="false"
+                app:stl_overlineColor="@color/white"
+                app:stl_overlineThickness="0dp"
+                app:stl_titleOffset="24dp"
+                app:stl_underlineColor="@color/white"
+                app:stl_underlineThickness="1dp" />
+
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/viewpagertab"
+                />
+
+        </RelativeLayout>
 
     </FrameLayout>
 </layout>

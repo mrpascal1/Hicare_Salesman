@@ -23,7 +23,7 @@
             android:minHeight="?attr/actionBarSize" />
 
 
-        <androidx.viewpager.widget.ViewPager
+        <com.ab.hicaresalesman.utils.CustomViewPager
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -48,19 +48,20 @@
                 android:layout_marginRight="5dp"
                 android:layout_weight="1"
                 android:baselineAligned="false"
+
                 android:drawableLeft="@drawable/ic_previous"
                 android:gravity="center"
                 android:onClick="@{(view) -> handler.onPrevClicked(view)}"
                 android:text="BACK"
                 android:textAllCaps="false"
-                android:textColor="@color/themeColor1"
+                android:textColor="@color/themeColor"
                 android:textSize="15sp" />
 
             <View
                 android:layout_width="0.5dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="@color/themeColor1" />
+                android:background="@color/themeColor" />
 
             <TextView
                 android:id="@+id/btnNext"
@@ -74,7 +75,7 @@
                 android:onClick="@{(view) -> handler.onNextClicked(view)}"
                 android:text="NEXT"
                 android:textAllCaps="false"
-                android:textColor="@color/themeColor1"
+                android:textColor="@color/themeColor"
                 android:textSize="15sp" />
 
 

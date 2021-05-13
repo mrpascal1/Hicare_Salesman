@@ -5,7 +5,7 @@ package com.ab.hicaresalesman.network;
  */
 
  public interface NetworkResponseListner<T> {
-  void onResponse(int requestCode, T response);
+  void onResponse(T response);
 
-  void onFailure(int requestCode);
+  void onFailure();
 }

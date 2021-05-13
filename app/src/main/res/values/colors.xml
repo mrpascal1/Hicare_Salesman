@@ -8,16 +8,13 @@
     <color name="themeColor1">#03DAC5</color>
     <color name="themeColor">#2bb77a</color>
     <color name="themeColorDark">#217d55</color>
-
     <color name="colorPurple">#673AB7</color>
     <color name="colorBlue">#3F51B5</color>
-
     <color name="orange">#FF9800</color>
-
     <color name="darkOrange">#FF5722</color>
     <color name="shadow_color">#3C3C3C</color>
     <color name="color_white">#FFFFFF</color>
-
+    <color name="light_theme">#e6f8fbf0</color>
     <color name="light_grey">#E8E8E8</color>
     <color name="colorbottom">#536DFE</color>
     <color name="outerBlue">#E5ECFF</color>
@@ -99,5 +96,7 @@
     <color name="game_green_dark">#3b6b35</color>
     <color name="amber">#ffa500</color>
     <color name="karmaGreen">#008000</color>
+    <color name="transparentGrey">#21737373</color>
+    <color name="darkGrey">#a6a6a6</color>
 
 </resources>
