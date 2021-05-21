@@ -20,11 +20,15 @@ import com.ab.hicaresalesman.databinding.FragmentServiceAreaBinding;
 import com.ab.hicaresalesman.network.NetworkCallController;
 import com.ab.hicaresalesman.network.NetworkResponseListner;
 import com.ab.hicaresalesman.network.models.BaseResponse;
+import com.ab.hicaresalesman.network.models.area.AddAreaRequest;
 import com.ab.hicaresalesman.network.models.area.AreaType;
 import com.ab.hicaresalesman.network.models.area.TowerData;
+import com.ab.hicaresalesman.network.models.question.SaveAnswerRequest;
 import com.ab.hicaresalesman.utils.AppUtils;
 
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,6 +49,7 @@ public class ServiceAreaFragment extends BaseFragment {
     public static ServiceAreaFragment newInstance(int activityId) {
         ServiceAreaFragment fragment = new ServiceAreaFragment();
         Bundle args = new Bundle();
+        args.putInt(ARGS_ACTIVITY, activityId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,7 +77,7 @@ public class ServiceAreaFragment extends BaseFragment {
         setViewPager();
     }
 
-    private void setViewPager() {
+    public void setViewPager() {
         try {
             mFragmentServiceAreaBinding.viewPager.setOffscreenPageLimit(2);
             mAdapter = new AreaViewPagerAdapter(getChildFragmentManager(), getActivity());
@@ -90,27 +95,85 @@ public class ServiceAreaFragment extends BaseFragment {
         }
     }
 
+    private boolean isUnitChecked(List<AddAreaRequest> listData) {
+        for (AddAreaRequest data : listData) {
+            if ((data.getUnit() == null || data.getUnit().equals(""))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private boolean isAreaChecked(List<AddAreaRequest> listData) {
+        for (AddAreaRequest data : listData) {
+            if ((data.getAreaSqFt() == null) || data.getAreaSqFt().equals("")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void refresh() {
+//        if (AppUtils.mHashArea != null) {
+//            AppUtils.mHashArea.clear();
+//        }
+//        if (AppUtils.mAreaData != null) {
+//            AppUtils.mAreaData.clear();
+//        }
+    }
+
+
+    private boolean isFloorChecked(List<AddAreaRequest> listData) {
+        for (AddAreaRequest data : listData) {
+            if ((data.getFloorNo() == null || data.getFloorNo().equals(""))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void addSubArea() {
         try {
-            NetworkCallController controller = new NetworkCallController(this);
-            controller.setListner(new NetworkResponseListner<BaseResponse>() {
-                @Override
-                public void onResponse(BaseResponse response) {
-                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-                    if (response.getIsSuccess()) {
-                        AppUtils.mAreaData.clear();
-                        AppUtils.mServiceList.clear();
-                        Toast.makeText(getActivity(), "Saved Successfully", Toast.LENGTH_SHORT).show();
+            if (AppUtils.mAreaData != null) {
+                AppUtils.mAreaData.clear();
+            }
+            AppUtils.mAreaData.addAll(AppUtils.mHashArea.values());
+            if (AppUtils.mAreaData != null && AppUtils.mAreaData.size() > 0) {
+                if (isUnitChecked(AppUtils.mAreaData)) {
+                    if (isAreaChecked(AppUtils.mAreaData)) {
+                        if (isFloorChecked(AppUtils.mAreaData)) {
+                            NetworkCallController controller = new NetworkCallController(this);
+                            controller.setListner(new NetworkResponseListner<BaseResponse>() {
+                                @Override
+                                public void onResponse(BaseResponse response) {
+                                    if (response.getIsSuccess()) {
+                                        AppUtils.mAreaData.clear();
+                                        AppUtils.mServiceList.clear();
+                                        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+                                    }
+                                }
 
+                                @Override
+                                public void onFailure() {
+
+                                }
+                            });
+                            controller.addSubArea(AppUtils.mAreaData);
+                        } else {
+                            Toasty.error(getActivity(), "Floor No. is required!", Toasty.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toasty.error(getActivity(), "Area Sq.Ft. is required!", Toasty.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toasty.error(getActivity(), "Unit is required!", Toasty.LENGTH_SHORT).show();
                 }
+            } else {
+                Toasty.error(getActivity(), "Area cannot be blank!", Toasty.LENGTH_SHORT).show();
 
-                @Override
-                public void onFailure() {
-
-                }
-            });
-            controller.addSubArea(AppUtils.mAreaData);
+//                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

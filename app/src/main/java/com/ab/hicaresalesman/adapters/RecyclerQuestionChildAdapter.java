@@ -1,7 +1,12 @@
 package com.ab.hicaresalesman.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,13 +62,28 @@ class RecyclerQuestionChildAdapter extends RecyclerView.Adapter<RecyclerQuestion
     public void onBindViewHolder(@NotNull RecyclerQuestionChildAdapter.ViewHolder holder, final int position) {
 
         try {
-            holder.itemRecyclerChildQuestionAdapterBinding.txtQuestion.setText(items.get(position).getQuestionTitle());
+
+            String question = items.get(position).getQuestionTitle();
+            String colored = "*";
+            SpannableStringBuilder builder = new SpannableStringBuilder();
+
+            builder.append(question);
+            int start = builder.length();
+            builder.append(colored);
+            int end = builder.length();
+
+            builder.setSpan(new ForegroundColorSpan(Color.RED), start, end,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            holder.itemRecyclerChildQuestionAdapterBinding.txtQuestion.setText(builder);
+
+
             holder.itemRecyclerChildQuestionAdapterBinding.txtQuestion.setTypeface(holder.itemRecyclerChildQuestionAdapterBinding.txtQuestion.getTypeface(), Typeface.BOLD);
             holder.itemRecyclerChildQuestionAdapterBinding.spnOption.setOnItemSelectedListener(null);
             addSpinnerOptions(holder.itemRecyclerChildQuestionAdapterBinding.spnOption, position, items.get(position).getOptionList());
 
 
-            if (items.get(position).getImageRequired()) {
+            if (items.get(holder.getAdapterPosition()).getImageRequired()) {
                 holder.itemRecyclerChildQuestionAdapterBinding.relPhoto.setVisibility(View.VISIBLE);
             } else {
                 holder.itemRecyclerChildQuestionAdapterBinding.relPhoto.setVisibility(View.GONE);
@@ -71,15 +91,15 @@ class RecyclerQuestionChildAdapter extends RecyclerView.Adapter<RecyclerQuestion
 //            holder.itemRecyclerChildQuestionAdapterBinding.spnOption.setSelection(items.get(parentPos).getOptionList().get(position).getSpnPosition());
 
             holder.itemRecyclerChildQuestionAdapterBinding.imageCancel.setOnClickListener(v -> {
-                items.get(position).setPictureUrl(null);
+                items.get(holder.getAdapterPosition()).setPictureUrl(null);
                 holder.itemRecyclerChildQuestionAdapterBinding.lnrImage.setVisibility(View.GONE);
                 holder.itemRecyclerChildQuestionAdapterBinding.lnrUpload.setVisibility(View.VISIBLE);
-//                notifyDataSetChanged();
-                mOnQuestionClickedHandler.onImageCancelled(parentPos, position);
+                notifyItemChanged(holder.getAdapterPosition());
+//                mOnQuestionClickedHandler.onImageCancelled(parentPos, position);
             });
 
-            if (items.get(position).getPictureUrl() != null && !items.get(position).getPictureUrl().equals("")) {
-                Picasso.get().load(items.get(position).getPictureUrl()).into(holder.itemRecyclerChildQuestionAdapterBinding.imgUploadedCheque);
+            if (items.get(holder.getAdapterPosition()).getPictureUrl() != null && !items.get(holder.getAdapterPosition()).getPictureUrl().equals("")) {
+                Picasso.get().load(items.get(holder.getAdapterPosition()).getPictureUrl()).resize(26, 6).onlyScaleDown().into(holder.itemRecyclerChildQuestionAdapterBinding.imgUploadedCheque);
                 holder.itemRecyclerChildQuestionAdapterBinding.lnrUpload.setVisibility(View.GONE);
                 holder.itemRecyclerChildQuestionAdapterBinding.lnrImage.setVisibility(View.VISIBLE);
             } else {
@@ -111,26 +131,14 @@ class RecyclerQuestionChildAdapter extends RecyclerView.Adapter<RecyclerQuestion
 
             spnAdapter.setDropDownViewResource(R.layout.spinner_popup);
             spnOption.setAdapter(spnAdapter);
-            for (int i = 0; i < optionList.size(); i++) {
-                if (optionList.get(i).getIsSelected()) {
-                    if (optionList.get(i).getOptionTitle() != null) {
-                        int spinnerPosition = spnAdapter.getPosition(optionList.get(i));
-                        spnOption.setSelection(spinnerPosition);
-                    }
-                }
 
-            }
-//            spnOption.setSelection(items.get(position).getParentPos());
+
+            spnOption.setSelection(items.get(position).getParentPos());
             spnOption.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                    if (pos > 0) {
-                        onOptionClicked.onOptionClicked(position, (OptionData) parent.getSelectedItem());
-                    }
-
+                    onOptionClicked.onOptionClicked(position, items.get(position).getQuestionId(), (OptionData) parent.getSelectedItem());
                     items.get(position).setParentPos(pos);
-
-
                 }
 
                 @Override
@@ -174,6 +182,6 @@ class RecyclerQuestionChildAdapter extends RecyclerView.Adapter<RecyclerQuestion
     }
 
     public interface OnOptionClicked {
-        void onOptionClicked(int position, OptionData item);
+        void onOptionClicked(int position, int questionId, OptionData item);
     }
 }

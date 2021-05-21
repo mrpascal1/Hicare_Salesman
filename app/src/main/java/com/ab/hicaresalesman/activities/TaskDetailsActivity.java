@@ -48,7 +48,6 @@ public class TaskDetailsActivity extends BaseActivity implements UserTaskDetailC
         setSupportActionBar(mActivityTaskDetailsBinding.toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         activityId = getIntent().getIntExtra(ARGS_ACTIVITY, 0);
-        AppUtils.getAreaByActivity(activityId);
         mActivityTaskDetailsBinding.btnNext.setTypeface(mActivityTaskDetailsBinding.btnNext.getTypeface(), Typeface.BOLD);
         mActivityTaskDetailsBinding.btnPrev.setTypeface(mActivityTaskDetailsBinding.btnPrev.getTypeface(), Typeface.BOLD);
         mActivityTaskDetailsBinding.viewPager.setPagingEnabled(false);
@@ -72,7 +71,7 @@ public class TaskDetailsActivity extends BaseActivity implements UserTaskDetailC
                     switch (position) {
                         case 0:
                             ((SelectServiceFragment) mViewPager.getItem(position)).refresh();
-                            setTitle("Select Service");
+                            setTitle("Select Services");
                             mActivityTaskDetailsBinding.btnNext.setText("NEXT");
 //                            mActivityTaskDetailsBinding.btnPrev.setTextColor(getResources().getColor(R.color.white));
 //                            mActivityTaskDetailsBinding.btnPrev.getCompoundDrawables()[0].setTint(getResources().getColor(R.color.white));
@@ -81,9 +80,11 @@ public class TaskDetailsActivity extends BaseActivity implements UserTaskDetailC
 //                            mActivityTaskDetailsBinding.btnNext.getCompoundDrawables()[0].setTint(getResources().getColor(R.color.themeColor));
                             break;
                         case 1:
-                            ((ServiceQuestionFragment) mViewPager.getItem(position)).refresh(mActivityTaskDetailsBinding.viewPager.getCurrentItem());
-                            setTitle("Service Questions");
+                            ((ServiceQuestionFragment) mViewPager.getItem(position)).refresh();
 
+                            setTitle("Service Questions");
+                            AppUtils.getAreaByActivity(activityId);
+                            mViewPager.notifyDataSetChanged();
                             mActivityTaskDetailsBinding.btnNext.setText("NEXT");
 //                            mActivityTaskDetailsBinding.btnPrev.setTextColor(getResources().getColor(R.color.themeColor));
 //                            mActivityTaskDetailsBinding.btnPrev.getCompoundDrawables()[0].setTint(getResources().getColor(R.color.themeColor));
@@ -93,6 +94,8 @@ public class TaskDetailsActivity extends BaseActivity implements UserTaskDetailC
                             break;
                         case 2:
                             setTitle("Service Area");
+                            ((ServiceAreaFragment) mViewPager.getItem(position)).setViewPager();
+                            ((ServiceAreaFragment) mViewPager.getItem(position)).refresh();
                             mActivityTaskDetailsBinding.btnNext.setText("NEXT");
 //                            mActivityTaskDetailsBinding.btnPrev.setTextColor(getResources().getColor(R.color.themeColor));
 //                            mActivityTaskDetailsBinding.btnPrev.getCompoundDrawables()[0].setTint(getResources().getColor(R.color.themeColor));
@@ -101,7 +104,8 @@ public class TaskDetailsActivity extends BaseActivity implements UserTaskDetailC
 //                            mActivityTaskDetailsBinding.btnNext.getCompoundDrawables()[0].setTint(getResources().getColor(R.color.themeColor));
                             break;
                         case 3:
-                            setTitle("Service Frequency");
+                            setTitle("Recommendations");
+                            AppUtils.getAreaByActivity(activityId);
 //                            mActivityTaskDetailsBinding.btnPrev.setTextColor(getResources().getColor(R.color.themeColor));
 //                            mActivityTaskDetailsBinding.btnPrev.getCompoundDrawables()[0].setTint(getResources().getColor(R.color.themeColor));
 //
@@ -162,7 +166,6 @@ public class TaskDetailsActivity extends BaseActivity implements UserTaskDetailC
                 FrequencyFragment fragment = (FrequencyFragment) mActivityTaskDetailsBinding.viewPager.getAdapter().instantiateItem(mActivityTaskDetailsBinding.viewPager, mActivityTaskDetailsBinding.viewPager.getCurrentItem());
                 fragment.addFrequency();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

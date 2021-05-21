@@ -34,6 +34,8 @@ import com.ab.hicaresalesman.utils.AppUtils;
 import java.util.List;
 import java.util.Objects;
 
+import es.dmoral.toasty.Toasty;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link AddTaskFragment#newInstance} factory method to
@@ -76,7 +78,7 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mFragmentAddTaskBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_task, container, false);
-        getActivity().setTitle("Add Activity");
+        getActivity().setTitle("Site Inspection Sheet");
         mFragmentAddTaskBinding.setHandler(this);
         return mFragmentAddTaskBinding.getRoot();
     }
@@ -157,7 +159,7 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
                 @Override
                 public void onResponse(AddActivityResponse response) {
                     if (response.getIsSuccess()) {
-                        Toast.makeText(getActivity(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
+                        Toasty.success(getActivity(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
                         getActivityList();
                     }
                 }

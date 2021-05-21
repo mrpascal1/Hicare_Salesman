@@ -45,6 +45,7 @@ import com.ab.hicaresalesman.network.models.area.AreaData;
 import com.ab.hicaresalesman.network.models.area.AreaType;
 import com.ab.hicaresalesman.network.models.area.ServiceActivity;
 import com.ab.hicaresalesman.network.models.area.ServiceActivityRequest;
+import com.ab.hicaresalesman.network.models.area.ServiceActivityType;
 import com.ab.hicaresalesman.network.models.area.TowerData;
 import com.google.gson.Gson;
 
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -70,8 +72,9 @@ public class AppUtils {
     public static List<AreaType> mRegularList = null;
     public static List<TowerData> mCommonTowerList = null;
     public static List<TowerData> mRegularTowerList = null;
-    public static List<ServiceActivity> mServiceList = new ArrayList<>();
+    public static List<ServiceActivityType> mServiceList = new ArrayList<>();
     public static List<AddAreaRequest> mAreaData = new ArrayList<>();
+    public static HashMap<Integer,AddAreaRequest> mHashArea = new HashMap<>();
     public  static boolean isCommonAllowMultiple = false;
     public  static boolean isRegularAllowMultiple = false;
     private static final int REQ_AREA = 1000;

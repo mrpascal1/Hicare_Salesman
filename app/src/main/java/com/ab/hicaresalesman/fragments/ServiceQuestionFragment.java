@@ -36,6 +36,7 @@ import com.ab.hicaresalesman.network.NetworkResponseListner;
 import com.ab.hicaresalesman.network.models.BaseResponse;
 import com.ab.hicaresalesman.network.models.image_upload.ImageUploadData;
 import com.ab.hicaresalesman.network.models.image_upload.ImageUploadRequest;
+import com.ab.hicaresalesman.network.models.pest_service.AddServiceRequest;
 import com.ab.hicaresalesman.network.models.question.QuestionData;
 import com.ab.hicaresalesman.network.models.question.Questions;
 import com.ab.hicaresalesman.network.models.question.SaveAnswerRequest;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
 import io.realm.RealmResults;
 
 /**
@@ -66,7 +68,7 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
     private List<QuestionData> questionData = new ArrayList<>();
     private ViewPager viewPager;
     private int activityId = 0;
-
+    private HashMap<Integer, SaveAnswerRequest> mMap = new HashMap<>();
 
     public ServiceQuestionFragment() {
         // Required empty public constructor
@@ -117,7 +119,6 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
                     try {
                         mAdapter.getItem(parentPos).getQuestions().get(childPos).setPictureUrl(response.getFileUrl());
                         mAdapter.notifyItemChanged(parentPos);
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -153,19 +154,25 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
         mFragmentServiceQuestionBinding.recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         mFragmentServiceQuestionBinding.recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerQuestionParentAdapter(getActivity(), (position, childPos, option) -> {
+        mAdapter = new RecyclerQuestionParentAdapter(getActivity(), (position, childPos, questionId, option) -> {
             SaveAnswerRequest request = new SaveAnswerRequest();
             request.setActivityId(activityId);
-            request.setAnswerText(option.getOptionTitle());
+            if (option.getOptionTitle().equals("Select Answer")) {
+                request.setAnswerText("");
+            } else {
+                request.setAnswerText(option.getOptionTitle());
+            }
             request.setNetScore(option.getNetScore());
             request.setQuestionId(option.getQuestionId());
             request.setId(0);
             request.setCreatedByIdUser(0);
+            request.setImageRequired(mAdapter.getItem(position).getQuestions().get(childPos).getImageRequired());
             request.setRiskLevel(option.getCategoryName());
             request.setModifiedOn(AppUtils.currentDateTime());
             request.setServiceName(mAdapter.getItem(position).getServiceType());
             request.setPicture_Url(questionData.get(position).getQuestions().get(childPos).getPictureUrl());
             mAnswerList.add(request);
+            mMap.put(questionId, request);
         });
         mFragmentServiceQuestionBinding.recyclerView.setAdapter(mAdapter);
         mAdapter.setOnQuestionClicked(this);
@@ -206,8 +213,8 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
 
     @Override
     public void onImageCancelled(int parentPosition, int childPosition) {
-        mAdapter.getItem(parentPos).getQuestions().get(childPos).setPictureUrl(null);
-        mAdapter.notifyItemChanged(parentPos);
+//        mAdapter.getItem(parentPos).getQuestions().get(childPos).setPictureUrl(null);
+//        mAdapter.notifyItemChanged(parentPos);
     }
 
     private void init() {
@@ -263,32 +270,69 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
         }
     }
 
-    public void refresh(int currentItem) {
+    public void refresh() {
+        if (mMap != null) {
+            mMap.clear();
+        }
         getQuestionsByActivity();
     }
 
+    private boolean isListChecked(List<SaveAnswerRequest> listData) {
+        for (SaveAnswerRequest data : listData) {
+            if ((data.getAnswerText().equals(""))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isImgChecked(List<SaveAnswerRequest> imgList) {
+        boolean isRequired = true;
+        for (SaveAnswerRequest data : imgList) {
+            if (data.isImageRequired()) {
+                if (data.getPicture_Url() != null && !data.getPicture_Url().equals("")) {
+                    isRequired = true;
+                } else {
+                    isRequired = false;
+                    break;
+                }
+            }
+        }
+        return isRequired;
+    }
+
+
     public void saveAnswers() {
         try {
+            mAnswerList = new ArrayList<>(mMap.values());
             if (mAnswerList.size() > 0) {
-                NetworkCallController controller = new NetworkCallController(this);
-                controller.setListner(new NetworkResponseListner<BaseResponse>() {
-                    @Override
-                    public void onResponse(BaseResponse response) {
-                        if (response.getIsSuccess()) {
+                if (isListChecked(mAnswerList)) {
+                    if (isImgChecked(mAnswerList)) {
+                        NetworkCallController controller = new NetworkCallController(this);
+                        controller.setListner(new NetworkResponseListner<BaseResponse>() {
+                            @Override
+                            public void onResponse(BaseResponse response) {
+                                if (response.getIsSuccess()) {
 //                            mAnswerList.clear();
-                            Toast.makeText(getActivity(), "Saved Successfully", Toast.LENGTH_SHORT).show();
-                            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-                        }
-                    }
+                                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+                                }
+                            }
 
-                    @Override
-                    public void onFailure() {
+                            @Override
+                            public void onFailure() {
 
+                            }
+                        });
+                        controller.saveAnswers(mAnswerList);
+                    } else {
+                        Toasty.error(getActivity(), "Image Required!", Toasty.LENGTH_SHORT).show();
                     }
-                });
-                controller.saveAnswers(mAnswerList);
+                } else {
+                    Toasty.error(getActivity(), "Please select answer!", Toasty.LENGTH_SHORT).show();
+                }
+
             } else {
-                Toast.makeText(getActivity(), "Please select service!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please Select Options", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();

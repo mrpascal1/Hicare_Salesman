@@ -59,21 +59,21 @@ public class RecycleSelectServiceAdapter extends RecyclerView.Adapter<RecycleSel
     public void onBindViewHolder(@NotNull final RecycleSelectServiceAdapter.ViewHolder holder, final int position) {
         holder.mItemRecyclerSelectServiceAdapterBinding.txtServiceName.setText(items.get(position).getServiceName() + "(" + items.get(position).getServiceCode() + ")");
         holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setOnCheckedChangeListener(null);
-        if (mMap.containsKey(items.get(position).getServiceId())) {
-            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(true);
-        } else {
-            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(false);
-        }
         holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+//                onOptionClicked.onClicked(items.get(position).getServiceId(), holder.getAdapterPosition(), isChecked);
+//                items.get(position).setSelected(isChecked);
                 if (isChecked) {
-                    onOptionClicked.onClicked(items.get(position).getServiceId(), position, true);
+                    onOptionClicked.onClicked(items.get(holder.getAdapterPosition()).getServiceId(), holder.getAdapterPosition(), true);
+                    items.get(holder.getAdapterPosition()).setSelected(true);
                 } else {
-                    onOptionClicked.onClicked(items.get(position).getServiceId(), position, false);
+                    onOptionClicked.onClicked(items.get(holder.getAdapterPosition()).getServiceId(), holder.getAdapterPosition(), false);
+                    items.get(holder.getAdapterPosition()).setSelected(false);
                 }
             }
         });
+        holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(items.get(position).isSelected());
     }
 
 

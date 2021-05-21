@@ -1,5 +1,6 @@
 package com.ab.hicaresalesman.fragments;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,19 +17,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.ab.hicaresalesman.BaseApplication;
 import com.ab.hicaresalesman.BaseFragment;
 import com.ab.hicaresalesman.R;
 import com.ab.hicaresalesman.activities.AddTaskActivity;
+import com.ab.hicaresalesman.activities.HomeActivity;
+import com.ab.hicaresalesman.activities.LoginActivity;
 import com.ab.hicaresalesman.adapters.RecyclerOpportunityAdapter;
 import com.ab.hicaresalesman.databinding.FragmentHomeBinding;
 import com.ab.hicaresalesman.handler.OnListItemClickHandler;
 import com.ab.hicaresalesman.network.NetworkCallController;
 import com.ab.hicaresalesman.network.NetworkResponseListner;
+import com.ab.hicaresalesman.network.models.login.LoginData;
+import com.ab.hicaresalesman.network.models.login.LoginResponse;
 import com.ab.hicaresalesman.network.models.opportunity.OpportunityData;
+import com.ab.hicaresalesman.utils.SharedPreferencesUtility;
 import com.ab.hicaresalesman.viewmodel.OpportunityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.RealmResults;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -76,39 +85,64 @@ public class HomeFragment extends BaseFragment {
         mAdapter = new RecyclerOpportunityAdapter(getActivity());
         mFragmentHomeBinding.recyclerView.setAdapter(mAdapter);
 
+        mFragmentHomeBinding.imgLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                dialog.setTitle(getString(R.string.logout_exit));
+                dialog.setMessage(getString(R.string.logout_do_you_really_want_to_exit));
+                dialog.setPositiveButton(getString(R.string.yes), (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    SharedPreferencesUtility.savePrefBoolean(getActivity(), SharedPreferencesUtility.IS_USER_LOGIN,
+                            false);
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                    getActivity().finish();
+                });
+                dialog.setNegativeButton(getString(R.string.no), (dialogInterface, i) -> dialogInterface.dismiss());
+                dialog.show();
+            }
+        });
+
         getRecentOpportunity();
         getSearchOpportunity();
     }
 
     private void getRecentOpportunity() {
         try {
-            NetworkCallController controller = new NetworkCallController(this);
-            controller.setListner(new NetworkResponseListner<List<OpportunityData>>() {
-                @Override
-                public void onResponse(List<OpportunityData> items) {
-                    if (items != null && items.size() > 0) {
-                        mOpportunityData = new ArrayList<>();
-                        mOpportunityData = items;
-                        mAdapter.setData(items);
-                        mAdapter.notifyDataSetChanged();
-                        mAdapter.setOnItemClickHandler(new OnListItemClickHandler() {
-                            @Override
-                            public void onItemClick(int position) {
-                                startActivity(new Intent(getActivity(), AddTaskActivity.class)
-                                        .putExtra(AddTaskActivity.ARGS_OPP_NO, items.get(position).getOpportunityNumberC())
-                                        .putExtra(AddTaskActivity.ARGS_INDUSTRY, items.get(position).getSubTypeC())
-                                );
+            if ((HomeActivity) getActivity() != null) {
+                RealmResults<LoginData> LoginRealmModels =
+                        BaseApplication.getRealm().where(LoginData.class).findAll();
+                if (LoginRealmModels != null && LoginRealmModels.size() > 0) {
+                    String id = LoginRealmModels.get(0).getId();
+                    NetworkCallController controller = new NetworkCallController(this);
+                    controller.setListner(new NetworkResponseListner<List<OpportunityData>>() {
+                        @Override
+                        public void onResponse(List<OpportunityData> items) {
+                            if (items != null && items.size() > 0) {
+                                mOpportunityData = new ArrayList<>();
+                                mOpportunityData = items;
+                                mAdapter.setData(items);
+                                mAdapter.notifyDataSetChanged();
+                                mAdapter.setOnItemClickHandler(new OnListItemClickHandler() {
+                                    @Override
+                                    public void onItemClick(int position) {
+                                        startActivity(new Intent(getActivity(), AddTaskActivity.class)
+                                                .putExtra(AddTaskActivity.ARGS_OPP_NO, items.get(position).getOpportunityNumberC())
+                                                .putExtra(AddTaskActivity.ARGS_INDUSTRY, items.get(position).getSubTypeC())
+                                        );
+                                    }
+                                });
                             }
-                        });
-                    }
-                }
+                        }
 
-                @Override
-                public void onFailure() {
+                        @Override
+                        public void onFailure() {
 
+                        }
+                    });
+                    controller.getRecentOpportunity(id);
                 }
-            });
-            controller.getRecentOpportunity("00528000002IZ04AAG");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

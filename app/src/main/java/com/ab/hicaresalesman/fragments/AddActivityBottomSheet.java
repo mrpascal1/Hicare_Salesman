@@ -30,6 +30,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import es.dmoral.toasty.Toasty;
+
 public class AddActivityBottomSheet extends BottomSheetDialogFragment implements UserBottomSheetActivityHandler {
     FragmentAddActivityBottomSheetBinding mAddActivityBottomSheetBinding;
     private String opportunityId;
@@ -110,7 +112,7 @@ public class AddActivityBottomSheet extends BottomSheetDialogFragment implements
                 @Override
                 public void onResponse(AddActivityResponse response) {
                     if (response.getIsSuccess()) {
-                        Toast.makeText(mContext, "Added Successfully", Toast.LENGTH_SHORT).show();
+                        Toasty.success(mContext, "Added Successfully", Toast.LENGTH_SHORT).show();
                         dismiss();
                     }
                 }
