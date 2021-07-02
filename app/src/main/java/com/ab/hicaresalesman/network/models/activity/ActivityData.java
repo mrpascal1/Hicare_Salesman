@@ -40,6 +40,9 @@ public class ActivityData {
     @SerializedName("Industry_Name")
     @Expose
     private String industryName;
+    @SerializedName("Cost_Generated")
+    @Expose
+    private Boolean Cost_Generated;
 
     public Integer getActivityId() {
         return activityId;
@@ -127,5 +130,21 @@ public class ActivityData {
 
     public void setIndustryName(String industryName) {
         this.industryName = industryName;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public Boolean getCost_Generated() {
+        return Cost_Generated;
+    }
+
+    public void setCost_Generated(Boolean cost_Generated) {
+        Cost_Generated = cost_Generated;
     }
 }

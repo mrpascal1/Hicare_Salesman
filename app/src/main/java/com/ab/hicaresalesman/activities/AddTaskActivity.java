@@ -19,8 +19,10 @@ public class AddTaskActivity extends BaseActivity {
     ActivityAddTaskBinding mActivityAddTaskBinding;
     public static final String ARGS_OPP_NO = "ARGS_OPP_NO";
     public static final String ARGS_INDUSTRY = "ARGS_INDUSTRY";
+    public static final String ARGS_INDUSTRY_ID = "ARGS_INDUSTRY_ID";
     private String opportunityId;
     private String industryName;
+    private int industryId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +31,10 @@ public class AddTaskActivity extends BaseActivity {
                 DataBindingUtil.setContentView(this, R.layout.activity_add_task);
         opportunityId = getIntent().getStringExtra(ARGS_OPP_NO);
         industryName = getIntent().getStringExtra(ARGS_INDUSTRY);
-        addFragment(AddTaskFragment.newInstance(opportunityId, industryName), "AddTaskActivity - AddTaskFragment");
+        industryId = getIntent().getIntExtra(ARGS_INDUSTRY_ID, 0);
+        addFragment(AddTaskFragment.newInstance(opportunityId, industryName, industryId), "AddTaskActivity - AddTaskFragment");
         setSupportActionBar(mActivityAddTaskBinding.toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
     }
 
     @Override
@@ -55,7 +57,6 @@ public class AddTaskActivity extends BaseActivity {
             getFragmentManager().popBackStack();
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

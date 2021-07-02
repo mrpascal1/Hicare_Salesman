@@ -2,9 +2,11 @@ package com.ab.hicaresalesman.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,9 +34,9 @@ public class RecycleSelectServiceAdapter extends RecyclerView.Adapter<RecycleSel
     private OnOptionClicked onOptionClicked;
     private ArrayList<String> multileItems = null;
     private HashMap<Integer, AddServiceRequest> mMap;
+    private boolean isCostGenerated = false;
 
-
-    public RecycleSelectServiceAdapter(Context context, HashMap<Integer, AddServiceRequest> mMap, OnOptionClicked onOptionClicked) {
+    public RecycleSelectServiceAdapter(Context context, HashMap<Integer, AddServiceRequest> mMap, boolean isCostGenerated, OnOptionClicked onOptionClicked) {
         if (items == null) {
             items = new ArrayList<>();
         }
@@ -44,6 +46,7 @@ public class RecycleSelectServiceAdapter extends RecyclerView.Adapter<RecycleSel
         this.mMap = mMap;
         this.onOptionClicked = onOptionClicked;
         this.mContext = context;
+        this.isCostGenerated = isCostGenerated;
     }
 
     @NotNull
@@ -59,21 +62,35 @@ public class RecycleSelectServiceAdapter extends RecyclerView.Adapter<RecycleSel
     public void onBindViewHolder(@NotNull final RecycleSelectServiceAdapter.ViewHolder holder, final int position) {
         holder.mItemRecyclerSelectServiceAdapterBinding.txtServiceName.setText(items.get(position).getServiceName() + "(" + items.get(position).getServiceCode() + ")");
         holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setOnCheckedChangeListener(null);
+        holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(false);
+
+        if (isCostGenerated) {
+            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setEnabled(false);
+            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setClickable(false);
+        } else {
+            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setEnabled(true);
+            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setClickable(true);
+        }
+
         holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-//                onOptionClicked.onClicked(items.get(position).getServiceId(), holder.getAdapterPosition(), isChecked);
-//                items.get(position).setSelected(isChecked);
-                if (isChecked) {
+                if (isChecked/* && holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.isPressed()*/) {
                     onOptionClicked.onClicked(items.get(holder.getAdapterPosition()).getServiceId(), holder.getAdapterPosition(), true);
-                    items.get(holder.getAdapterPosition()).setSelected(true);
+                    items.get(position).setSelected(true);
                 } else {
                     onOptionClicked.onClicked(items.get(holder.getAdapterPosition()).getServiceId(), holder.getAdapterPosition(), false);
-                    items.get(holder.getAdapterPosition()).setSelected(false);
+                    items.get(position).setSelected(false);
                 }
             }
         });
-        holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(items.get(position).isSelected());
+        if (items.get(position).isSelected()) {
+            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(true);
+
+        } else {
+            holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(false);
+        }
+        items.get(position).setSelected(false);
     }
 
 
@@ -84,6 +101,13 @@ public class RecycleSelectServiceAdapter extends RecyclerView.Adapter<RecycleSel
 
     public void setOnItemClickHandler(OnListItemClickHandler onItemClickHandler) {
         this.onItemClickHandler = onItemClickHandler;
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull @NotNull ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setOnCheckedChangeListener(null);
+        holder.mItemRecyclerSelectServiceAdapterBinding.checkOption.setChecked(false);
     }
 
 

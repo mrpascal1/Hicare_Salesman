@@ -12,11 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.ab.hicaresalesman.BaseFragment;
 import com.ab.hicaresalesman.R;
@@ -29,14 +27,12 @@ import com.ab.hicaresalesman.network.NetworkResponseListner;
 import com.ab.hicaresalesman.network.models.BaseResponse;
 import com.ab.hicaresalesman.network.models.pest_service.AddServiceRequest;
 import com.ab.hicaresalesman.network.models.pest_service.ServiceData;
-import com.ab.hicaresalesman.utils.AppUtils;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import es.dmoral.toasty.Toasty;
 
@@ -48,24 +44,26 @@ import es.dmoral.toasty.Toasty;
 public class SelectServiceFragment extends BaseFragment {
     FragmentSelectServiceBinding mFragmentSelectServiceBinding;
     public static final String ARGS_ACTIVITY = "ARGS_ACTIVITY";
+    public static final String ARGS_COST = "ARGS_COST";
 
     RecycleSelectServiceAdapter mAdapter;
     RecyclerView.LayoutManager layoutManager;
     private OnNextEventHandler mCallback;
     private ViewPager viewPager;
     private int activityId = 0;
+    private boolean isCostGenerated = false;
     private HashMap<Integer, AddServiceRequest> mMap = new HashMap<>();
 
-    private List<AddServiceRequest> mServiceList = new ArrayList<>();
 
     public SelectServiceFragment() {
         // Required empty public constructor
     }
 
-    public static SelectServiceFragment newInstance(int activityId) {
+    public static SelectServiceFragment newInstance(int activityId, boolean isCostGenerated) {
         SelectServiceFragment fragment = new SelectServiceFragment();
         Bundle args = new Bundle();
         args.putInt(ARGS_ACTIVITY, activityId);
+        args.putBoolean(ARGS_COST, isCostGenerated);
         fragment.setArguments(args);
         return fragment;
     }
@@ -91,6 +89,7 @@ public class SelectServiceFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             activityId = getArguments().getInt(ARGS_ACTIVITY);
+            isCostGenerated = getArguments().getBoolean(ARGS_COST);
         }
     }
 
@@ -105,12 +104,14 @@ public class SelectServiceFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         viewPager = getActivity().findViewById(R.id.viewPager);
         mFragmentSelectServiceBinding.recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         mFragmentSelectServiceBinding.recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecycleSelectServiceAdapter(getActivity(), mMap, (serviceId, position, isChecked) -> {
-            if(isChecked){
+        mAdapter = new RecycleSelectServiceAdapter(getActivity(), mMap, isCostGenerated, (serviceId, position, isChecked) -> {
+
+            if (isChecked) {
                 AddServiceRequest request = new AddServiceRequest();
                 request.setActivityId(activityId);
                 request.setServiceId(mAdapter.getItem(position).getServiceId());
@@ -118,7 +119,7 @@ public class SelectServiceFragment extends BaseFragment {
                 request.setServiceCode(mAdapter.getItem(position).getServiceCode());
                 request.setCreatedBy(mAdapter.getItem(position).getCreatedBy());
                 mMap.put(serviceId, request);
-            }else {
+            } else {
                 if (mMap.containsKey(serviceId)) {
                     mMap.remove(serviceId);
                 }
@@ -144,7 +145,6 @@ public class SelectServiceFragment extends BaseFragment {
 
     private void getServicesByActivity() {
         try {
-
             NetworkCallController controller = new NetworkCallController(this);
             controller.setListner(new NetworkResponseListner<List<ServiceData>>() {
 
@@ -176,12 +176,13 @@ public class SelectServiceFragment extends BaseFragment {
     public void addServiceByActivity() {
         try {
             if (mMap != null && mMap.size() > 0) {
-                mServiceList = new ArrayList<>(mMap.values());
+                List<AddServiceRequest> mServiceList = new ArrayList<>(mMap.values());
                 NetworkCallController controller = new NetworkCallController(this);
                 controller.setListner(new NetworkResponseListner<BaseResponse>() {
                     @Override
                     public void onResponse(BaseResponse response) {
                         if (response.getIsSuccess()) {
+                            mMap.clear();
                             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
                         }
                     }
@@ -193,7 +194,7 @@ public class SelectServiceFragment extends BaseFragment {
                 });
                 controller.addServiceByActivity(mServiceList);
             } else {
-                Toasty.error(getActivity(), "Please select service!",Toasty.LENGTH_SHORT).show();
+                Toasty.error(getActivity(), "Please select service!", Toasty.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,5 +203,20 @@ public class SelectServiceFragment extends BaseFragment {
 
     public void refresh() {
         getServicesByActivity();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mMap != null) {
+            mMap.clear();
+        }
+        mFragmentSelectServiceBinding.recyclerView.setAdapter(null);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mFragmentSelectServiceBinding.recyclerView.setAdapter(null);
     }
 }

@@ -36,9 +36,7 @@ import com.ab.hicaresalesman.network.NetworkResponseListner;
 import com.ab.hicaresalesman.network.models.BaseResponse;
 import com.ab.hicaresalesman.network.models.image_upload.ImageUploadData;
 import com.ab.hicaresalesman.network.models.image_upload.ImageUploadRequest;
-import com.ab.hicaresalesman.network.models.pest_service.AddServiceRequest;
 import com.ab.hicaresalesman.network.models.question.QuestionData;
-import com.ab.hicaresalesman.network.models.question.Questions;
 import com.ab.hicaresalesman.network.models.question.SaveAnswerRequest;
 import com.ab.hicaresalesman.utils.AppUtils;
 import com.google.android.material.snackbar.Snackbar;
@@ -48,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
-import io.realm.RealmResults;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,8 +55,9 @@ import io.realm.RealmResults;
 public class ServiceQuestionFragment extends BaseFragment implements OnQuestionClickedHandler {
     FragmentServiceQuestionBinding mFragmentServiceQuestionBinding;
     public static final String ARGS_ACTIVITY = "ARGS_ACTIVITY";
+    public static final String ARGS_COST = "ARGS_COST";
     RecyclerQuestionParentAdapter mAdapter;
-    RecyclerView.LayoutManager layoutManager;
+    LinearLayoutManager layoutManager;
     private static final int REQUEST_CODE = 1234;
     private boolean mPermissions;
     private int parentPos = 0;
@@ -68,16 +66,18 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
     private List<QuestionData> questionData = new ArrayList<>();
     private ViewPager viewPager;
     private int activityId = 0;
+    private boolean isCostGenerated = false;
     private HashMap<Integer, SaveAnswerRequest> mMap = new HashMap<>();
 
     public ServiceQuestionFragment() {
         // Required empty public constructor
     }
 
-    public static ServiceQuestionFragment newInstance(int activityId) {
+    public static ServiceQuestionFragment newInstance(int activityId, boolean isCostGenerated) {
         ServiceQuestionFragment fragment = new ServiceQuestionFragment();
         Bundle args = new Bundle();
         args.putInt(ARGS_ACTIVITY, activityId);
+        args.putBoolean(ARGS_COST, isCostGenerated);
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,6 +87,7 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             activityId = getArguments().getInt(ARGS_ACTIVITY);
+            isCostGenerated = getArguments().getBoolean(ARGS_COST);
         }
         AppUtils.CAMERA_SCREEN = "QUESTIONS";
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
@@ -154,7 +155,7 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
         mFragmentServiceQuestionBinding.recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         mFragmentServiceQuestionBinding.recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerQuestionParentAdapter(getActivity(), (position, childPos, questionId, option) -> {
+        mAdapter = new RecyclerQuestionParentAdapter(getActivity(), isCostGenerated, (position, childPos, questionId, option) -> {
             SaveAnswerRequest request = new SaveAnswerRequest();
             request.setActivityId(activityId);
             if (option.getOptionTitle().equals("Select Answer")) {
@@ -171,10 +172,11 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
             request.setModifiedOn(AppUtils.currentDateTime());
             request.setServiceName(mAdapter.getItem(position).getServiceType());
             request.setPicture_Url(questionData.get(position).getQuestions().get(childPos).getPictureUrl());
-            mAnswerList.add(request);
+//            mAnswerList.add(request);
             mMap.put(questionId, request);
         });
         mFragmentServiceQuestionBinding.recyclerView.setAdapter(mAdapter);
+        mFragmentServiceQuestionBinding.recyclerView.smoothScrollToPosition(mAdapter.getItemCount());
         mAdapter.setOnQuestionClicked(this);
         getQuestionsByActivity();
     }
@@ -191,6 +193,7 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
                         questionData = items;
                         mAdapter.addData(items);
                         mAdapter.notifyDataSetChanged();
+                        mFragmentServiceQuestionBinding.recyclerView.smoothScrollToPosition(0);
                     }
                 }
 
@@ -274,7 +277,9 @@ public class ServiceQuestionFragment extends BaseFragment implements OnQuestionC
         if (mMap != null) {
             mMap.clear();
         }
+        mFragmentServiceQuestionBinding.recyclerView.smoothScrollToPosition(mAdapter.getItemCount());
         getQuestionsByActivity();
+
     }
 
     private boolean isListChecked(List<SaveAnswerRequest> listData) {

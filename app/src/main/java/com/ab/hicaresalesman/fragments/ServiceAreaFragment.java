@@ -11,7 +11,6 @@ import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.ab.hicaresalesman.BaseFragment;
 import com.ab.hicaresalesman.R;
@@ -21,9 +20,6 @@ import com.ab.hicaresalesman.network.NetworkCallController;
 import com.ab.hicaresalesman.network.NetworkResponseListner;
 import com.ab.hicaresalesman.network.models.BaseResponse;
 import com.ab.hicaresalesman.network.models.area.AddAreaRequest;
-import com.ab.hicaresalesman.network.models.area.AreaType;
-import com.ab.hicaresalesman.network.models.area.TowerData;
-import com.ab.hicaresalesman.network.models.question.SaveAnswerRequest;
 import com.ab.hicaresalesman.utils.AppUtils;
 
 import java.util.List;
@@ -40,16 +36,19 @@ public class ServiceAreaFragment extends BaseFragment {
     private AreaViewPagerAdapter mAdapter;
     private ViewPager viewPager;
     private int activityId = 0;
+    private boolean isCostGenerated = false;
     public static final String ARGS_ACTIVITY = "ARGS_ACTIVITY";
+    public static final String ARGS_COST = "ARGS_COST";
 
     public ServiceAreaFragment() {
         // Required empty public constructor
     }
 
-    public static ServiceAreaFragment newInstance(int activityId) {
+    public static ServiceAreaFragment newInstance(int activityId, boolean isCostGenerated) {
         ServiceAreaFragment fragment = new ServiceAreaFragment();
         Bundle args = new Bundle();
         args.putInt(ARGS_ACTIVITY, activityId);
+        args.putBoolean(ARGS_COST, isCostGenerated);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,6 +58,7 @@ public class ServiceAreaFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             activityId = getArguments().getInt(ARGS_ACTIVITY);
+            isCostGenerated = getArguments().getBoolean(ARGS_COST);
         }
     }
 
@@ -82,10 +82,10 @@ public class ServiceAreaFragment extends BaseFragment {
             mFragmentServiceAreaBinding.viewPager.setOffscreenPageLimit(2);
             mAdapter = new AreaViewPagerAdapter(getChildFragmentManager(), getActivity());
             if (AppUtils.mCommonList != null && AppUtils.mCommonList.size() > 0) {
-                mAdapter.addFragment(CommonAreaFragment.newInstance(), "COMMON AREA");
+                mAdapter.addFragment(CommonAreaFragment.newInstance(isCostGenerated), "COMMON AREA");
             }
             if (AppUtils.mRegularList != null && AppUtils.mRegularList.size() > 0) {
-                mAdapter.addFragment(RegularAreaFragment.newInstance(), "REGULAR AREA");
+                mAdapter.addFragment(RegularAreaFragment.newInstance(isCostGenerated), "REGULAR AREA");
             }
             mFragmentServiceAreaBinding.viewpagertab.setDistributeEvenly(true);
             mFragmentServiceAreaBinding.viewPager.setAdapter(mAdapter);
@@ -115,6 +115,7 @@ public class ServiceAreaFragment extends BaseFragment {
     }
 
     public void refresh() {
+        setViewPager();
 //        if (AppUtils.mHashArea != null) {
 //            AppUtils.mHashArea.clear();
 //        }
@@ -142,27 +143,27 @@ public class ServiceAreaFragment extends BaseFragment {
             if (AppUtils.mAreaData != null && AppUtils.mAreaData.size() > 0) {
                 if (isUnitChecked(AppUtils.mAreaData)) {
                     if (isAreaChecked(AppUtils.mAreaData)) {
-                        if (isFloorChecked(AppUtils.mAreaData)) {
-                            NetworkCallController controller = new NetworkCallController(this);
-                            controller.setListner(new NetworkResponseListner<BaseResponse>() {
-                                @Override
-                                public void onResponse(BaseResponse response) {
-                                    if (response.getIsSuccess()) {
-                                        AppUtils.mAreaData.clear();
-                                        AppUtils.mServiceList.clear();
-                                        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-                                    }
+//                        if (isFloorChecked(AppUtils.mAreaData)) {
+                        NetworkCallController controller = new NetworkCallController(this);
+                        controller.setListner(new NetworkResponseListner<BaseResponse>() {
+                            @Override
+                            public void onResponse(BaseResponse response) {
+                                if (response.getIsSuccess()) {
+                                    AppUtils.mAreaData.clear();
+                                    AppUtils.mServiceList.clear();
+                                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
                                 }
+                            }
 
-                                @Override
-                                public void onFailure() {
+                            @Override
+                            public void onFailure() {
 
-                                }
-                            });
-                            controller.addSubArea(AppUtils.mAreaData);
-                        } else {
-                            Toasty.error(getActivity(), "Floor No. is required!", Toasty.LENGTH_SHORT).show();
-                        }
+                            }
+                        });
+                        controller.addSubArea(AppUtils.mAreaData);
+//                        } else {
+//                            Toasty.error(getActivity(), "Floor No. is required!", Toasty.LENGTH_SHORT).show();
+//                        }
                     } else {
                         Toasty.error(getActivity(), "Area Sq.Ft. is required!", Toasty.LENGTH_SHORT).show();
                     }

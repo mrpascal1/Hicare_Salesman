@@ -12,6 +12,7 @@ import com.ab.hicaresalesman.network.models.activity.AddActivityRequest;
 import com.ab.hicaresalesman.network.models.activity.AddActivityResponse;
 import com.ab.hicaresalesman.network.models.area.AddAreaRequest;
 import com.ab.hicaresalesman.network.models.area.AreaResponse;
+import com.ab.hicaresalesman.network.models.cost_service_list.CostServiceList;
 import com.ab.hicaresalesman.network.models.frequency.FrequencyRequest;
 import com.ab.hicaresalesman.network.models.frequency.FrequencyResponse;
 import com.ab.hicaresalesman.network.models.image_upload.ImageUploadRequest;
@@ -294,14 +295,14 @@ public class NetworkCallController {
 
     public void getQuestionByActivity(final int activityId) {
         try {
-            mContext.showProgressDialog();
+//            mContext.showProgressDialog();
             BaseApplication.getRetrofitAPI(false)
                     .getQuestionsByActivity(activityId)
                     .enqueue(new Callback<QuestionResponse>() {
                         @Override
                         public void onResponse(Call<QuestionResponse> call,
                                                Response<QuestionResponse> response) {
-                            mContext.dismissProgressDialog();
+//                            mContext.dismissProgressDialog();
 
                             if (response != null) {
                                 if (response.body() != null) {
@@ -310,27 +311,25 @@ public class NetworkCallController {
                                 } else if (response.errorBody() != null) {
                                     try {
                                         JSONObject jObjError = new JSONObject(response.errorBody().string());
-                                        mContext.showServerError(jObjError.getString("Message"));
+//                                        mContext.showServerError(jObjError.getString("Message"));
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
                             } else {
-                                mContext.showServerError();
+//                                mContext.showServerError();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<QuestionResponse> call, Throwable t) {
-                            mContext.dismissProgressDialog();
-                            mContext.showServerError(mContext.getString(R.string.something_went_wrong));
-
+//                            mContext.dismissProgressDialog();
+//                            mContext.showServerError(mContext.getString(R.string.something_went_wrong));
                         }
                     });
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void getActivityBySubArea(final int activityId) {
@@ -602,4 +601,44 @@ public class NetworkCallController {
 
     }
 
+    public void getServiceCostList(final int activityId) {
+        try {
+            mContext.showProgressDialog();
+            BaseApplication.getRetrofitAPI(false)
+                    .getActivityServiceList(activityId)
+                    .enqueue(new Callback<CostServiceList>() {
+                        @Override
+                        public void onResponse(Call<CostServiceList> call,
+                                               Response<CostServiceList> response) {
+                            mContext.dismissProgressDialog();
+
+                            if (response != null) {
+                                if (response.body() != null) {
+                                    mListner.onResponse(response.body().getData());
+
+                                } else if (response.errorBody() != null) {
+                                    try {
+                                        JSONObject jObjError = new JSONObject(response.errorBody().string());
+                                        mContext.showServerError(jObjError.getString("Message"));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            } else {
+                                mContext.showServerError();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CostServiceList> call, Throwable t) {
+                            mContext.dismissProgressDialog();
+                            mContext.showServerError(mContext.getString(R.string.something_went_wrong));
+                        }
+                    });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

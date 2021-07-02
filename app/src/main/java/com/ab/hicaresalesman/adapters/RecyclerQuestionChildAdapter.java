@@ -41,12 +41,14 @@ class RecyclerQuestionChildAdapter extends RecyclerView.Adapter<RecyclerQuestion
     private OnOptionClicked onOptionClicked;
     private String optionType;
     private int parentPos = 0;
+    private boolean isCostGenerated = false;
 
-    public RecyclerQuestionChildAdapter(Context mContext, List<Questions> data, int parentPosition, OnOptionClicked onOptionClicked) {
+    public RecyclerQuestionChildAdapter(Context mContext, boolean isCostGenerated, List<Questions> data, int parentPosition, OnOptionClicked onOptionClicked) {
         items = data;
         this.onOptionClicked = onOptionClicked;
         this.mContext = mContext;
         this.parentPos = parentPosition;
+        this.isCostGenerated = isCostGenerated;
     }
 
     @NotNull
@@ -79,7 +81,9 @@ class RecyclerQuestionChildAdapter extends RecyclerView.Adapter<RecyclerQuestion
 
 
             holder.itemRecyclerChildQuestionAdapterBinding.txtQuestion.setTypeface(holder.itemRecyclerChildQuestionAdapterBinding.txtQuestion.getTypeface(), Typeface.BOLD);
-            holder.itemRecyclerChildQuestionAdapterBinding.spnOption.setOnItemSelectedListener(null);
+
+//            holder.itemRecyclerChildQuestionAdapterBinding.spnOption.setOnItemSelectedListener(null);
+
             addSpinnerOptions(holder.itemRecyclerChildQuestionAdapterBinding.spnOption, position, items.get(position).getOptionList());
 
 
@@ -131,9 +135,14 @@ class RecyclerQuestionChildAdapter extends RecyclerView.Adapter<RecyclerQuestion
 
             spnAdapter.setDropDownViewResource(R.layout.spinner_popup);
             spnOption.setAdapter(spnAdapter);
-
-
+            if(isCostGenerated){
+                spnOption.setEnabled(false);
+            }else {
+                spnOption.setEnabled(true);
+            }
             spnOption.setSelection(items.get(position).getParentPos());
+            onOptionClicked.onOptionClicked(position, items.get(position).getQuestionId(), (OptionData) spnOption.getSelectedItem());
+
             spnOption.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {

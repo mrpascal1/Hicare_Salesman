@@ -6,6 +6,7 @@ import com.ab.hicaresalesman.network.models.activity.AddActivityRequest;
 import com.ab.hicaresalesman.network.models.activity.AddActivityResponse;
 import com.ab.hicaresalesman.network.models.area.AddAreaRequest;
 import com.ab.hicaresalesman.network.models.area.AreaResponse;
+import com.ab.hicaresalesman.network.models.cost_service_list.CostServiceList;
 import com.ab.hicaresalesman.network.models.frequency.FrequencyRequest;
 import com.ab.hicaresalesman.network.models.frequency.FrequencyResponse;
 import com.ab.hicaresalesman.network.models.image_upload.ImageUploadRequest;
@@ -31,7 +32,7 @@ public interface IRetrofit {
 
     /*[User Login]*/
     @GET("User/LoginAsync")
-    Call<LoginResponse> getLogin(@Query("username") String username, @Query("password") String password);
+    Call<LoginResponse> getLogin(@Query("userName") String username, @Query("password") String password);
 
 
     /*[Opportunity/RecentOpportunityAsync]*/
@@ -90,4 +91,8 @@ public interface IRetrofit {
     /*[RecommendedFrequency/AddRecommendedFrequency]*/
     @POST("RecommendedFrequency/AddRecommendedFrequency")
     Call<BaseResponse> addFrequency(@Body List<FrequencyRequest> request);
+
+    /*[RecommendedFrequency/GetRecommendedFrequencyList]*/
+    @GET("Activity/GetActivityServiceList")
+    Call<CostServiceList> getActivityServiceList(@Query("activityId") int activityId);
 }

@@ -36,17 +36,14 @@ import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddTaskFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AddTaskFragment extends BaseFragment implements UserActivityAddClickHandler, OnItemDeleteClickHandler, AddActivityBottomSheet.IdialogDismissFragmentReload {
     public static final String ARGS_OPP_NO = "ARGS_OPP_NO";
     public static final String ARGS_INDUSTRY = "ARGS_INDUSTRY";
+    public static final String ARGS_INDUSTRY_ID = "ARGS_INDUSTRY_ID";
     FragmentAddTaskBinding mFragmentAddTaskBinding;
     private String opportunityId;
     private String industryName;
+    private int industryId;
     RecyclerAddActivityAdapter mAdapter;
     RecyclerView.LayoutManager layoutManager;
 
@@ -55,11 +52,12 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
         // Required empty public constructor
     }
 
-    public static AddTaskFragment newInstance(String opportunityId, String industryName) {
+    public static AddTaskFragment newInstance(String opportunityId, String industryName, int industryId) {
         AddTaskFragment fragment = new AddTaskFragment();
         Bundle args = new Bundle();
         args.putString(ARGS_OPP_NO, opportunityId);
         args.putString(ARGS_INDUSTRY, industryName);
+        args.putInt(ARGS_INDUSTRY_ID, industryId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,6 +68,7 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
         if (getArguments() != null) {
             opportunityId = getArguments().getString(ARGS_OPP_NO);
             industryName = getArguments().getString(ARGS_INDUSTRY);
+            industryId = getArguments().getInt(ARGS_INDUSTRY_ID);
         }
     }
 
@@ -93,6 +92,12 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
         mAdapter.setItemDeleteClickHandler(this);
         mFragmentAddTaskBinding.recyclerView.setAdapter(mAdapter);
 
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         getActivityList();
     }
 
@@ -110,7 +115,9 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
                             @Override
                             public void onItemClick(int position) {
                                 startActivity(new Intent(getActivity(), TaskDetailsActivity.class)
-                                        .putExtra(TaskDetailsActivity.ARGS_ACTIVITY, mAdapter.getItem(position).getActivityId()));
+                                        .putExtra(TaskDetailsActivity.ARGS_ACTIVITY, mAdapter.getItem(position).getActivityId())
+                                        .putExtra(TaskDetailsActivity.ARGS_COST, mAdapter.getItem(position).getCostGenerated())
+                                );
                             }
                         });
                     }
@@ -130,7 +137,7 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
     @Override
     public void onActivityAddClicked(View view) {
         try {
-            AddActivityBottomSheet bottomSheet = new AddActivityBottomSheet(opportunityId, industryName);
+            AddActivityBottomSheet bottomSheet = new AddActivityBottomSheet(opportunityId, industryName, industryId);
             bottomSheet.setListener(this);
             bottomSheet.show(Objects.requireNonNull(getActivity()).getSupportFragmentManager(), bottomSheet.getTag());
 
@@ -151,7 +158,6 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
             request.setIndustryName(mAdapter.getItem(position).getIndustryName());
             request.setOpportunityId(mAdapter.getItem(position).getOpportunityId());
             request.setIsDeleted(true);
-            request.setCreatedByIdUser(0);
             request.setModifiedByIdUser(0);
             request.setCreatedOn(AppUtils.currentDateTime());
             request.setModifiedOn(AppUtils.currentDateTime());

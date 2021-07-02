@@ -18,6 +18,7 @@ public class ActivityViewModel implements Parcelable {
     private String modifiedOn;
     private int indistryId;
     private String industryName;
+    private Boolean isCostGenerated;
 
     public ActivityViewModel() {
         this.activityId = 0;
@@ -29,6 +30,7 @@ public class ActivityViewModel implements Parcelable {
         this.modifiedOn = "NA";
         this.indistryId = 0;
         this.industryName = "NA";
+        this.isCostGenerated = false;
     }
 
 
@@ -42,7 +44,40 @@ public class ActivityViewModel implements Parcelable {
         modifiedOn = in.readString();
         indistryId = in.readInt();
         industryName = in.readString();
+        byte tmpIsCostGenerated = in.readByte();
+        isCostGenerated = tmpIsCostGenerated == 0 ? null : tmpIsCostGenerated == 1;
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(activityId);
+        dest.writeString(opportunityId);
+        dest.writeString(activityCode);
+        dest.writeString(activityName);
+        dest.writeByte((byte) (isDeleted ? 1 : 0));
+        dest.writeString(createdOn);
+        dest.writeString(modifiedOn);
+        dest.writeInt(indistryId);
+        dest.writeString(industryName);
+        dest.writeByte((byte) (isCostGenerated == null ? 0 : isCostGenerated ? 1 : 2));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ActivityViewModel> CREATOR = new Creator<ActivityViewModel>() {
+        @Override
+        public ActivityViewModel createFromParcel(Parcel in) {
+            return new ActivityViewModel(in);
+        }
+
+        @Override
+        public ActivityViewModel[] newArray(int size) {
+            return new ActivityViewModel[size];
+        }
+    };
 
     public int getActivityId() {
         return activityId;
@@ -116,34 +151,12 @@ public class ActivityViewModel implements Parcelable {
         this.industryName = industryName;
     }
 
-    public static final Creator<ActivityViewModel> CREATOR = new Creator<ActivityViewModel>() {
-        @Override
-        public ActivityViewModel createFromParcel(Parcel in) {
-            return new ActivityViewModel(in);
-        }
-
-        @Override
-        public ActivityViewModel[] newArray(int size) {
-            return new ActivityViewModel[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public Boolean getCostGenerated() {
+        return isCostGenerated;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(activityId);
-        parcel.writeString(opportunityId);
-        parcel.writeString(activityCode);
-        parcel.writeString(activityName);
-        parcel.writeByte((byte) (isDeleted ? 1 : 0));
-        parcel.writeString(createdOn);
-        parcel.writeString(modifiedOn);
-        parcel.writeInt(indistryId);
-        parcel.writeString(industryName);
+    public void setCostGenerated(Boolean costGenerated) {
+        isCostGenerated = costGenerated;
     }
 
     public void clone(ActivityData data){
@@ -156,5 +169,6 @@ public class ActivityViewModel implements Parcelable {
         this.modifiedOn = data.getModifiedOn();
         this.indistryId = data.getIndustryId();
         this.industryName = data.getIndustryName();
+        this.isCostGenerated = data.getCost_Generated();
     }
 }

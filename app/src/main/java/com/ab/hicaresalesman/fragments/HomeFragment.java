@@ -129,6 +129,7 @@ public class HomeFragment extends BaseFragment {
                                         startActivity(new Intent(getActivity(), AddTaskActivity.class)
                                                 .putExtra(AddTaskActivity.ARGS_OPP_NO, items.get(position).getOpportunityNumberC())
                                                 .putExtra(AddTaskActivity.ARGS_INDUSTRY, items.get(position).getSubTypeC())
+                                                .putExtra(AddTaskActivity.ARGS_INDUSTRY_ID, items.get(position).getIndustryId())
                                         );
                                     }
                                 });
@@ -184,10 +185,8 @@ public class HomeFragment extends BaseFragment {
                     searchByOpportunity(query);
                     return false;
                 }
-
                 @Override
                 public boolean onQueryTextChange(String newText) {
-
                     return false;
                 }
             });
@@ -197,24 +196,30 @@ public class HomeFragment extends BaseFragment {
             e.printStackTrace();
         }
     }
-
     private void searchByOpportunity(String newText) {
         try {
-            NetworkCallController controller = new NetworkCallController(HomeFragment.this);
-            controller.setListner(new NetworkResponseListner<List<OpportunityData>>() {
-                @Override
-                public void onResponse(List<OpportunityData> items) {
-                    if (items != null) {
-                        filter(newText, items);
-                    }
-                }
+            if ((HomeActivity) getActivity() != null) {
+                RealmResults<LoginData> LoginRealmModels =
+                        BaseApplication.getRealm().where(LoginData.class).findAll();
+                if (LoginRealmModels != null && LoginRealmModels.size() > 0) {
+                    String id = LoginRealmModels.get(0).getId();
+                    NetworkCallController controller = new NetworkCallController(HomeFragment.this);
+                    controller.setListner(new NetworkResponseListner<List<OpportunityData>>() {
+                        @Override
+                        public void onResponse(List<OpportunityData> items) {
+                            if (items != null) {
+                                filter(newText, items);
+                            }
+                        }
 
-                @Override
-                public void onFailure() {
+                        @Override
+                        public void onFailure() {
 
+                        }
+                    });
+                    controller.getSearchOpportunity(newText, id);
                 }
-            });
-            controller.getSearchOpportunity(newText, "00528000002IZ04AAG");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
