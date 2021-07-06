@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "608750462587",
+    "project_id": "hicare-salesman",
+    "storage_bucket": "hicare-salesman.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608750462587:android:d6968caf19c58136c7e4de",
+        "android_client_info": {
+          "package_name": "com.ab.hicaresalesman"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "608750462587-2cvr1e1ueqv5keak002iv7o8to23vrf7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHoYms5LOblsZ4b8yAjn4F04FDlEaGYL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "608750462587-2cvr1e1ueqv5keak002iv7o8to23vrf7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
