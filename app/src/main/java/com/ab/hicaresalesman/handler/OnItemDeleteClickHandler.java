@@ -5,4 +5,5 @@ package com.ab.hicaresalesman.handler;
  */
 public interface OnItemDeleteClickHandler {
     void onDeleteActivityClicked(int position);
+    void onActivityCloneClicked(int position);
 }

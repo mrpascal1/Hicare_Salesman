@@ -159,15 +159,28 @@
                 android:layout_weight="1.16"
                 android:orientation="horizontal"
                 android:gravity="right"
-                android:weightSum="3">
+                android:weightSum="2">
 
+                <ImageView
+                    android:id="@+id/imgClone"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_clone_new"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"/>
 
+                <ImageView
+                    android:id="@+id/imgDelete"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_trash_round_red"
+                    android:layout_gravity="center"/>
                 <LinearLayout
                     android:id="@+id/lnrView"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:layout_weight="0"
+                    android:layout_weight="2"
                     android:gravity="center">
 
                     <LinearLayout
@@ -176,8 +189,8 @@
                         android:layout_height="27dp"
                         android:layout_gravity="center"
                         android:background="@drawable/circlebg"
-
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:id="@+id/innerAdd"
@@ -200,14 +213,15 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/lnrDelete"
+                    android:id="@+id/lnrDeleteold"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_weight="2"
                     android:layout_marginRight="5dp"
                     android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
 
                     <LinearLayout
@@ -227,7 +241,7 @@
                             android:gravity="center">
 
                             <ImageView
-                                android:id="@+id/imgDelete"
+                                android:id="@+id/imgDeleteold"
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:layout_gravity="center"

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ab.hicaresalesman.R;
 import com.ab.hicaresalesman.databinding.ItemRecyclerActivityAdapterBinding;
+import com.ab.hicaresalesman.handler.OnItemActivityCloneClickedHandler;
 import com.ab.hicaresalesman.handler.OnItemDeleteClickHandler;
 import com.ab.hicaresalesman.handler.OnListItemClickHandler;
 import com.ab.hicaresalesman.network.models.activity.ActivityData;
@@ -30,6 +31,7 @@ public class RecyclerAddActivityAdapter extends RecyclerView.Adapter<RecyclerAdd
 
     private OnListItemClickHandler onItemClickHandler;
     private OnItemDeleteClickHandler mItemDeleteClickHandler;
+//    private OnItemActivityCloneClickedHandler mItemActivityCloneClickedHandler;
     private final Context mContext;
     private static List<ActivityViewModel> items = null;
 
@@ -75,7 +77,7 @@ public class RecyclerAddActivityAdapter extends RecyclerView.Adapter<RecyclerAdd
             });
 
             holder.itemRecyclerActivityAdapterBinding.imgDelete.setOnClickListener(view -> mItemDeleteClickHandler.onDeleteActivityClicked(position));
-
+            holder.itemRecyclerActivityAdapterBinding.imgClone.setOnClickListener(view -> mItemDeleteClickHandler.onActivityCloneClicked(position));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,6 +96,7 @@ public class RecyclerAddActivityAdapter extends RecyclerView.Adapter<RecyclerAdd
     public void setItemDeleteClickHandler(OnItemDeleteClickHandler mOnItemDeleteClickHandler) {
         this.mItemDeleteClickHandler = mOnItemDeleteClickHandler;
     }
+
 
     public void setData(List<ActivityData> data) {
         items.clear();

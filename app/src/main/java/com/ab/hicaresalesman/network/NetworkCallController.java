@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.RealmResults;
@@ -250,6 +251,26 @@ public class NetworkCallController {
             e.printStackTrace();
         }
 
+    }
+
+    public void cloneActivity(HashMap<String, Object> request){
+        BaseApplication.getRetrofitAPI(true)
+                .cloneActivity(request)
+                .enqueue(new Callback<BaseResponse>() {
+                    @Override
+                    public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                        if (response != null) {
+                            if (response.body() != null) {
+                                mListner.onResponse(response.body());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BaseResponse> call, Throwable t) {
+                        mListner.onFailure();
+                    }
+                });
     }
 
     public void getServiceByActivity(final int activityId) {

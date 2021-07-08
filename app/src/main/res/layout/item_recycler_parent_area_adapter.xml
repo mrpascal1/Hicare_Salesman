@@ -91,8 +91,7 @@
                     android:layout_marginRight="15dp"
                     android:layout_toLeftOf="@id/lnrClone"
                     android:background="@drawable/circle_bg_blue"
-                    android:gravity="center"
-                    android:visibility="">
+                    android:gravity="center">
 
                     <LinearLayout
                         android:id="@+id/lnr"
@@ -105,10 +104,10 @@
 
                         <ImageView
                             android:id="@+id/imgDelete"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
                             android:layout_gravity="center"
-                            app:srcCompat="@drawable/ic_rubbish_bin" />
+                            app:srcCompat="@drawable/ic_round_edit" />
 
                     </LinearLayout>
 
@@ -151,8 +150,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_toLeftOf="@id/lnrArrow"
                     android:background="@drawable/circle_bg_pink"
-                    android:gravity="center"
-                    android:visibility="">
+                    android:gravity="center">
 
                     <LinearLayout
                         android:id="@+id/lnrDelete"
@@ -164,7 +162,7 @@
                        >
 
                         <ImageView
-                            android:id="@+id/imgDelete"
+                            android:id="@+id/imgDelete2"
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:layout_gravity="center"

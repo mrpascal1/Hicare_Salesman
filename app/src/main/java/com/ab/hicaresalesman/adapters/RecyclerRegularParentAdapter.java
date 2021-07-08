@@ -1,6 +1,8 @@
 package com.ab.hicaresalesman.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +22,7 @@ import com.ab.hicaresalesman.databinding.ItemRecyclerParentAreaAdapterBinding;
 import com.ab.hicaresalesman.handler.OnAreaClickedHandler;
 import com.ab.hicaresalesman.handler.OnItemCloneClickHandler;
 import com.ab.hicaresalesman.network.models.area.TowerData;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -71,6 +76,9 @@ public class RecyclerRegularParentAdapter extends RecyclerView.Adapter<RecyclerR
                 onClicked.onClicked(holder.getAdapterPosition(), position1, subId, items.get(holder.getAdapterPosition()).getTower(), value);
             });
 
+            holder.mItemRecyclerParentAreaAdapterBinding.outerEdit.setOnClickListener(view ->
+                    alertDialogDemo(holder)
+            );
             holder.mItemRecyclerParentAreaAdapterBinding.recycleChild.setLayoutManager(new LinearLayoutManager(mContext));
             holder.mItemRecyclerParentAreaAdapterBinding.recycleChild.setHasFixedSize(true);
             holder.mItemRecyclerParentAreaAdapterBinding.recycleChild.setClipToPadding(false);
@@ -123,6 +131,43 @@ public class RecyclerRegularParentAdapter extends RecyclerView.Adapter<RecyclerR
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    void alertDialogDemo(RecyclerRegularParentAdapter.ViewHolder holder) {
+        // get alert_dialog.xml view
+        LayoutInflater li = LayoutInflater.from(mContext);
+        View promptsView = li.inflate(R.layout.alert_dialog, null);
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+
+        // set alert_dialog.xml to alertdialog builder
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView.findViewById(R.id.etUserInput);
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // get user input and set it to result
+                        // edit text
+                        holder.mItemRecyclerParentAreaAdapterBinding.txtTower.setText(userInput.getText().toString().trim());
+                        //Toast.makeText(mContext, "Entered: "+userInput.getText().toString(), Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
     }
 
     public void setOnItemClickHandler(OnItemClickListener onItemClickHandler) {

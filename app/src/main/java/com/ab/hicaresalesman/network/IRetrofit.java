@@ -18,6 +18,7 @@ import com.ab.hicaresalesman.network.models.pest_service.ServiceResponse;
 import com.ab.hicaresalesman.network.models.question.QuestionResponse;
 import com.ab.hicaresalesman.network.models.question.SaveAnswerRequest;
 
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -95,4 +96,7 @@ public interface IRetrofit {
     /*[RecommendedFrequency/GetRecommendedFrequencyList]*/
     @GET("Activity/GetActivityServiceList")
     Call<CostServiceList> getActivityServiceList(@Query("activityId") int activityId);
+
+    @POST("Activity/CloneActivity")
+    Call<BaseResponse> cloneActivity(@Body HashMap<String, Object> clone);
 }

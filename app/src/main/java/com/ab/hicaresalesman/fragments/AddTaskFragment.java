@@ -21,16 +21,19 @@ import com.ab.hicaresalesman.R;
 import com.ab.hicaresalesman.activities.TaskDetailsActivity;
 import com.ab.hicaresalesman.adapters.RecyclerAddActivityAdapter;
 import com.ab.hicaresalesman.databinding.FragmentAddTaskBinding;
+import com.ab.hicaresalesman.handler.OnItemActivityCloneClickedHandler;
 import com.ab.hicaresalesman.handler.OnItemDeleteClickHandler;
 import com.ab.hicaresalesman.handler.OnListItemClickHandler;
 import com.ab.hicaresalesman.handler.UserActivityAddClickHandler;
 import com.ab.hicaresalesman.network.NetworkCallController;
 import com.ab.hicaresalesman.network.NetworkResponseListner;
+import com.ab.hicaresalesman.network.models.BaseResponse;
 import com.ab.hicaresalesman.network.models.activity.ActivityData;
 import com.ab.hicaresalesman.network.models.activity.AddActivityRequest;
 import com.ab.hicaresalesman.network.models.activity.AddActivityResponse;
 import com.ab.hicaresalesman.utils.AppUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -182,7 +185,49 @@ public class AddTaskFragment extends BaseFragment implements UserActivityAddClic
     }
 
     @Override
+    public void onActivityCloneClicked(int position) {
+        try {
+            HashMap<String, Object> clone = new HashMap<>();
+            clone.put("Activity_Id", mAdapter.getItem(position).getActivityId());
+            clone.put("Opportunity_Id", mAdapter.getItem(position).getOpportunityId());
+            clone.put("Activity_Code", mAdapter.getItem(position).getActivityCode());
+            clone.put("Activity_Name", mAdapter.getItem(position).getActivityName());
+            clone.put("Is_Deleted", mAdapter.getItem(position).isDeleted());
+            clone.put("Created_On", mAdapter.getItem(position).getCreatedOn());
+            clone.put("Created_By_Id_User", mAdapter.getItem(position).getActivityId());
+            clone.put("Modified_On", mAdapter.getItem(position).getModifiedOn());
+            clone.put("Modified_By_Id_User", mAdapter.getItem(position).getActivityId());
+            clone.put("Industry_Id", mAdapter.getItem(position).getIndistryId());
+            clone.put("Industry_Name", mAdapter.getItem(position).getIndustryName());
+            clone.put("Cost_Generated", mAdapter.getItem(position).getCostGenerated());
+            NetworkCallController controller = new NetworkCallController(this);
+            controller.setListner(new NetworkResponseListner<BaseResponse>() {
+
+                @Override
+                public void onResponse(BaseResponse response) {
+                    if (response != null){
+                        if (response.getIsSuccess()){
+                            Toasty.success(getActivity(), "Cloned Successfully", Toast.LENGTH_SHORT).show();
+                            getActivityList();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+
+                }
+            });
+            controller.cloneActivity(clone);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onDismisClick() {
         getActivityList();
     }
+
+
 }
